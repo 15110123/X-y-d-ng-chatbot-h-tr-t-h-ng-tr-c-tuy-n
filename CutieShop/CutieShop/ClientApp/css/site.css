@@ -1,0 +1,9 @@
+/*Global CSS*/
+@import url('https://fonts.googleapis.com/css?family=Pangolin&subset=vietnamese');
+
+body {
+    font-family: 'Pangolin', cursive, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-image: url("/img/background.png");
+    background-size: 350px;
+    overflow-x: hidden;
+}

@@ -1,0 +1,38 @@
+/*Classes*/
+.BarIcon
+{
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.Emoji
+{
+    cursor: pointer;
+    font-size: 20px;
+    margin: 0 5px 0 5px;
+}
+
+/*Id*/
+#BarContainer
+{
+border: 1px;
+border-style: solid;
+border-radius: 20px;
+border-color: rgb(185, 185, 185);
+padding: 5px 5px 5px 5px;
+display: inline-block;
+}
+
+#EmojiTable
+{
+    display: table;
+    border-radius: 20px;
+    box-shadow: 2px 2px 10px rgb(184, 184, 184);
+    margin-bottom: 10px;
+}
+
+#ChatboxButtonBar
+{
+user-select: none;
+}

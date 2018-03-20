@@ -1,0 +1,40 @@
+/*Id*/
+#stickyBar{
+    text-align: center;
+    background-color: rgb(219, 219, 219);
+    padding: 5px 0 5px 0;
+}
+
+#linkGroup{
+    text-align: center;
+    color: rgb(175, 175, 175);
+}
+
+#profileBar{
+    margin-top: -5px;
+    padding: 2px 2px 2px 0;
+    position: absolute;
+    right: 0;
+}
+
+#profileBar > *{
+vertical-align: middle;
+}
+
+#profileBar > label{
+    margin-bottom: 0;
+    }
+
+#profileBar > img{
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+}
+
+#profileBar > #drawerBtn{
+border: none;
+font-size: 20px;
+color: rgb(0, 0, 0);
+margin: 0 5px 0 5px;
+cursor: pointer;
+}

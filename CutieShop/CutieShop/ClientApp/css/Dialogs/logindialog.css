@@ -1,0 +1,14 @@
+﻿.loginDialog * {
+    font-family: 'Pangolin', cursive, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+
+.loginDialog .loginTextField {
+    font-size: 20px !important;
+}
+
+@media (min-width: 1043px) {
+    .loginDialog {
+        width: 600px;
+        margin: 0 auto;
+    }
+}

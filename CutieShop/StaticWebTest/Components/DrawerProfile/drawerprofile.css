@@ -1,0 +1,55 @@
+/*id*/
+#drawerProfile{
+padding-top: 10px;
+padding-left: 10px;
+width: 300px;
+background-color: rgb(78, 78, 78);
+}
+
+#drawerProfile *{
+    -webkit-user-drag: none;
+    user-select: none;
+}
+
+#drawerProfile > #profileImg{
+border-radius: 100%;
+width: 70px;
+height: 70px;
+display: inline-block;
+vertical-align: middle;
+margin-right: 5px;
+}
+
+#drawerProfile > #profileInfo{
+    vertical-align: middle;
+    display: inline-block;
+}
+
+#drawerProfile > #profileInfo > #profileName{
+    font-size: 25px;
+    color: rgb(255, 255, 255);
+    display: block;
+    margin-bottom: 2px;
+}
+
+#drawerProfile > #profileInfo > #profileScore{
+    font-size: 20px;
+    color: rgb(126, 126, 126);
+    display: block;
+    margin-bottom: 2px;
+}
+
+#drawerProfile > #profileLink{
+    text-align: right;
+}
+
+#drawerProfile > #profileLink > .profileLinkWrapper{
+    background-color: rgb(255, 255, 255);
+    display: inline;
+    padding: 3px 5px 5px 5px;
+    border-radius: 10px 0 0 0;
+}
+
+#drawerProfile > #profileLink > .profileLinkWrapper > *{
+    text-decoration-line: none;
+}

@@ -1,0 +1,122 @@
+.Dropdown {
+    text-align: center;
+    display: inline-block;
+    vertical-align: top;
+    width: 180px;
+}
+
+.BtnNav {
+    background-color: green;
+    border: 0;
+    color: white;
+    cursor: pointer;
+    height: 35px;
+    width: 100%;
+    border-radius: 5px;
+}
+
+.BtnNav .navBtnIcon {
+    width: 25px;
+    height: 25px;
+    position: relative;
+    top: 0;
+    margin: 0 0 0 15px;
+    vertical-align: middle;
+}
+
+    .BtnNav:focus {
+        outline: none;
+    }
+
+.Dropdown:hover .BtnNav .navBtnIcon {
+    animation: ToRight;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+    animation-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.Dropdown:hover label {
+    animation: ToLeft;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+    animation-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.BtnNav label {
+    position: relative;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 25px;
+    margin: 0 15px 0 5px;
+    line-height: 25px;
+    vertical-align: middle;
+}
+
+/*Dropdown menu*/
+.Dropdown .Dropdown-content {
+    display: none;
+}
+
+    .Dropdown .Dropdown-content:hover {
+        display: block;
+    }
+
+.Dropdown:hover .Dropdown-content {
+    display: block;
+    animation: Flip;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+    position: absolute;
+    width: 180px;
+    z-index: 3;
+    background-color: rgb(0, 42, 0);
+}
+
+.Dropdown .Dropdown-content a {
+    display: block;
+    text-decoration: unset;
+    color: rgb(194, 194, 194);
+    font-size: 20px;
+}
+
+    .Dropdown .Dropdown-content a:hover {
+        font-size: 30px;
+        color: #fff;
+    }
+
+/*Animation frames*/
+@keyframes ToRight {
+    from {
+        left: 0;
+    }
+
+    to {
+        left: 100px;
+    }
+}
+
+@keyframes ToLeft {
+    from {
+        right: 0;
+    }
+
+    to {
+        right: 20%;
+    }
+}
+
+@keyframes Flip {
+    from {
+        transform: rotateY(-90deg);
+    }
+
+    to {
+        transform: rotateY(0deg);
+    }
+}
+
+@media (max-width: 1440px) {
+    .Dropdown {
+        margin-bottom: 20px;
+    }
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="/js/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="chatboxButtonBar.css" />
+    <link rel="stylesheet" href="/css/fontawesome-all.min.css">
+</head>
+
+<body>
+    <div id="ChatboxButtonBar">
+        <div id="EmojiTable" style="display: none">
+            <span class="Emoji">
+                😀
+            </span>
+            <span class="Emoji">
+                😁
+            </span>
+            <span class="Emoji">
+                😂
+            </span>
+            <span class="Emoji">
+                🤣
+            </span>
+        </div>
+        <div id="BarContainer">
+            <span>
+                <label for="BtnFileUpload">
+                    <img src="/svg/PhotoIcon.svg" class="BarIcon PhotoIcon">
+                </label>
+            </span>
+            <span>
+                <img src="/svg/EmojiIcon.svg" class="BarIcon EmojiIcon">
+            </span>
+        </div>
+    </div>
+    <img id="UploadedImage-id12345" src="" height="200" alt="Image preview...">
+</body>
+
+<input type="file" id="BtnFileUpload" style="display: none" accept=".jpg,.png,.jpeg,image/jpeg,image/png">
+
+<script type="text/javascript" src="chatboxButtonBar.js"></script>
+
+</html>

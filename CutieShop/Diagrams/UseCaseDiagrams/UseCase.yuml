@@ -1,0 +1,17 @@
+// {type:usecase}
+// {direction:leftToRight}
+// {generate:true}
+
+(note: Cutie Shop{bg:beige})
+[Khach hang]-(Dang ky thanh vien)
+[Khach hang]-(Dang nhap)
+[Khach hang]-(Dang xuat)
+[Khach hang]-(Dat hang online)
+(Dat hang online)>(Theo doi tinh trang don hang)
+(Tra cuu san pham)<(So sanh san pham)
+[Khach hang]-(Tra cuu san pham)
+(Dang nhap)-[Nhan vien]
+(Dang xuat)-[Nhan vien]
+(Tra cuu san pham)-[Nhan vien]
+(Theo doi tinh trang don hang)-[Nhan vien]
+(Xuat hoa don ban)-[Nhan vien]
