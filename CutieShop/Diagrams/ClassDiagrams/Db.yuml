@@ -21,7 +21,7 @@
 [Store|(Id);Name;Address;IsPrimary;Manager;IsDeleted]
 [Auth|(Id);Username;Password;Name;ProfileImg;IsDeleted]
 [AuthSession|(Id);Auth;IsDeleted]
-[Customer|(Id);Address;PhoneNumber;Email]
+[Customer|(Id);Address;PhoneNumber;Email;FacebookID]
 [Employee|(Id);Address;DateOfBirth;HomeTown;PhoneNumber;Email;EmpType;Store]
 [Score|(Customer);Value]
 [EmpType|(Id);Name]
@@ -30,13 +30,9 @@
 [ShipStatus|(Id);Name;Description]
 [Order|(Id);UsedScore;DateOrdered;IsDeleted]
 [Post|(Id);Employee;Title;Content;VidUrl;IsDeleted]
-[Documentation|(Id);Type;Owner;HTMLContent]
-[DocType|(Id);Name;Description]
 [PetSize|(Id);Name]
 [Material|(Id);Name]
 [ServiceOnlineOrder|(Id);Service;DateStart;TicketId]
-[Import|(Id);Date;Employee;ImporterName;IsDeleted]
-[Export|(Id);Date;Employee;Store;IsDeleted]
 
 //Good 
 [Good]<1-1>[ShipableGood]
@@ -47,8 +43,6 @@
 [ShipableGood]<1-1>[Food]
 [Good]<1-1>[Service]
 [Good]<n-n>[Order]
-[Good]<n-n>[Import]
-[Good]<n-n>[Export]
 //Good quantity for each store
 [Good]<n-n>[Store]
 
@@ -85,8 +79,6 @@
 [Employee]<n-1>[Store]
 [Employee]<1-1>[Store]
 [Employee]<1-n>[Post]
-[Employee]<1-n>[Import]
-[Employee]<1-n>[Export]
 
 //Advertisement
 [Advertisement]<n-1>[Employee]
@@ -102,13 +94,6 @@
 [Auth]<1-1>[Employee]
 [Auth]<1-n>[AuthSession]
 
-//Documentation
-[Documentation]<n-1>[Employee]
-[Documentation]<1-1>[DocType]
-
 //Order
 [Order]<1-1>[ServiceOnlineOrder]
 [Order]<1-1>[Shipment]
-
-//Store
-[Store]<1-n>[Export]
