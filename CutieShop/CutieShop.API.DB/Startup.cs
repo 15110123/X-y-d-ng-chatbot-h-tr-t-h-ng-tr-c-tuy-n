@@ -28,18 +28,10 @@ namespace CutieShop.API.DB
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseCors(builder =>
-                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().AllowCredentials());
             }
 
-            else
-            {
-                //Redirect all HTTP request to HTTPS: https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl
-                var options = new RewriteOptions().AddRedirectToHttps();
-                app.UseRewriter(options);
-                app.UseCors(builder =>
-                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().AllowCredentials());
-            }
+            app.UseCors(builder =>
+                builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().AllowCredentials());
 
             app.UseMvc();
         }
