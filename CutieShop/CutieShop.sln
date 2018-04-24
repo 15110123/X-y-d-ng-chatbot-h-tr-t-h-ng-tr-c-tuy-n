@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CutieShop", "CutieShop\Cuti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CutieShop.API", "CutieShopAPI\CutieShop.API.csproj", "{1EA6857C-0695-4D3C-BF37-25B662559ED3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CutieShop.API.DB", "CutieShop.API.DB\CutieShop.API.DB.csproj", "{F8F8863C-F68F-4551-827F-7921CEFA59B5}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{1EA6857C-0695-4D3C-BF37-25B662559ED3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1EA6857C-0695-4D3C-BF37-25B662559ED3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1EA6857C-0695-4D3C-BF37-25B662559ED3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F8F8863C-F68F-4551-827F-7921CEFA59B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F8F8863C-F68F-4551-827F-7921CEFA59B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F8F8863C-F68F-4551-827F-7921CEFA59B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F8F8863C-F68F-4551-827F-7921CEFA59B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
