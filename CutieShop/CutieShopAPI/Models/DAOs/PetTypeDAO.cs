@@ -1,37 +1,76 @@
-﻿using System;
+﻿using CutieShop.API.Models.Entities.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CutieShop.API.Models.Entities.Models.Entities;
+
 // ReSharper disable InconsistentNaming
 
 namespace CutieShop.API.Models.DAOs
 {
     public sealed class PetTypeDAO : CutieshopDAO<string, PetType>
     {
-        public override Task<bool> Create(PetType entity)
+        public override async Task<bool> Create(PetType entity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await Context.PetType.AddAsync(entity);
+                return await Context.SaveChangesAsync() != 0;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        public override Task<bool> Delete(string id)
+        public override async Task<bool> Delete(string id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Context.PetType.Remove(await Read(id));
+                return await Context.SaveChangesAsync() != 0;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        public override Task<PetType> Read(string id)
+        public override async Task<PetType> Read(string id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await Context.PetType.FindAsync(id);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
-        public override Task<IEnumerable<PetType>> ReadAll(string id)
+        public override async Task<IEnumerable<PetType>> ReadAll(string id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return Context.PetType.AsNoTracking().Where(x => x.PetTypeId == id);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
-        public override Task<bool> Update(PetType entity)
+        public override async Task<bool> Update(PetType entity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Context.PetType.Update(entity);
+                return await Context.SaveChangesAsync() != 0;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

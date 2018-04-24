@@ -1,9 +1,8 @@
-﻿using System;
+﻿using CutieShop.API.Models.Entities.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CutieShop.API.Models.Entities.Models.Entities;
-using Microsoft.EntityFrameworkCore;
 
 // ReSharper disable InconsistentNaming
 
@@ -73,7 +72,7 @@ namespace CutieShop.API.Models.DAOs
         {
             try
             {
-                Context.Product.Remove(await Context.Product.FindAsync(id));
+                Context.Product.Remove(await Read(id));
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
