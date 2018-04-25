@@ -1,8 +1,9 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+
 // ReSharper disable InconsistentNaming
 
-namespace CutieShop.API.Models.DAOs
+namespace Testing.DB.DAOs
 {
     internal interface IDAO<in TID, TEntity>
     {

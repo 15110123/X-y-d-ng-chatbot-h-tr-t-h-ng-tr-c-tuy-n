@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using CutieShop.API.Models.ChatHandlers;
+using CutieShop.API.Models.JSONEntities.FacebookRichMessages;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -21,6 +22,7 @@ namespace CutieShop.API.Controllers
 
             try
             {
+
                 dynamic request = JsonConvert.DeserializeObject(await new StreamReader(Request.Body).ReadToEndAsync());
 
                 try

@@ -1,11 +1,11 @@
-﻿using CutieShop.API.Models.Entities.Models.Entities;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Testing.DB.Entities;
 
 // ReSharper disable InconsistentNaming
 
-namespace CutieShop.API.Models.DAOs
+namespace Testing.DB.DAOs
 {
     public abstract class CutieshopDAO<TID, TEntity> : IDAO<TID, TEntity>, IDisposable
     {

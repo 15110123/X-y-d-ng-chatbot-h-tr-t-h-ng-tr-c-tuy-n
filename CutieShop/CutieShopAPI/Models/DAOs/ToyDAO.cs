@@ -1,9 +1,9 @@
 ﻿// ReSharper disable InconsistentNaming
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using CutieShop.API.Models.Entities.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CutieShop.API.Models.DAOs
 {
@@ -27,7 +27,7 @@ namespace CutieShop.API.Models.DAOs
         {
             try
             {
-                return await Context.Toy.FindAsync(id);
+                return await Context.Toy.Include(x => x.Product).FirstAsync(x => x.ProductId == id);
             }
             catch
             {
@@ -35,7 +35,7 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<IEnumerable<Toy>> ReadAllChild()
+        public override async Task<IQueryable<Toy>> ReadAllChild()
         {
             try
             {

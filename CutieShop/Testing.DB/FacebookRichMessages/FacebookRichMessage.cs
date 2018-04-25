@@ -1,7 +1,7 @@
 ﻿
 // ReSharper disable InconsistentNaming
 
-namespace CutieShop.API.Models.JSONEntities.FacebookRichMessages
+namespace Testing.DB.FacebookRichMessages
 {
     internal abstract class FacebookRichMessage
     {

@@ -1,11 +1,11 @@
-﻿using CutieShop.API.Models.Entities.Models.Entities;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Testing.DB.Entities;
 
 // ReSharper disable InconsistentNaming
 
-namespace CutieShop.API.Models.DAOs
+namespace Testing.DB.DAOs
 {
     public sealed class PetDAO : ProductDAO<Pet>
     {

@@ -1,10 +1,10 @@
-﻿using System.Diagnostics;
-using CutieShop.API.Models.DAOs;
+﻿using CutieShop.API.Models.DAOs;
 using CutieShop.API.Models.Exceptions;
+using CutieShop.API.Models.JSONEntities.FacebookRichMessages;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
-using static CutieShop.API.Models.Utils.ChatRequestUtils;
 
 // ReSharper disable InconsistentNaming
 
@@ -49,7 +49,7 @@ namespace CutieShop.API.Models.ChatHandlers
                 #region Step 4
                 case 4:
                     {
-                        Storage.AddOrUpdateToStorage(GetMessengerSenderId(Request), 5, GetMessengerReply(Request));
+                        Storage.AddOrUpdateToStorage(MsgId, 5, MsgReply);
                         return Receiver.Json(new
                         {
                             speech = "",
@@ -69,7 +69,7 @@ namespace CutieShop.API.Models.ChatHandlers
                 #region Step 3
                 case 3:
                     {
-                        Storage.AddOrUpdateToStorage(GetMessengerSenderId(Request), 4, GetMessengerReply(Request));
+                        Storage.AddOrUpdateToStorage(MsgId, 4, MsgReply);
                         return Receiver.Json(new
                         {
                             speech = "",
@@ -91,14 +91,76 @@ namespace CutieShop.API.Models.ChatHandlers
 
                 case 2:
                     {
-                        Storage.AddOrUpdateToStorage(GetMessengerSenderId(Request), 3, GetMessengerReply(Request));
-                        switch (Storage[GetMessengerSenderId(Request)][4])
+                        Storage.AddOrUpdateToStorage(MsgId, 3, MsgReply);
+
+                        //Find minimum and maximum price from step 3
+                        int minimumPrice, maximumPrice;
+
+                        if (Storage[MsgId][3] == "<100000")
+                        {
+                            minimumPrice = 0;
+                            maximumPrice = 99999;
+                        }
+                        else if (Storage[MsgId][3] == "100000 - 300000")
+                        {
+                            minimumPrice = 100000;
+                            maximumPrice = 300000;
+                        }
+                        else if (Storage[MsgId][3] == ">300000 - 500000")
+                        {
+                            minimumPrice = 300001;
+                            maximumPrice = 500000;
+                        }
+                        else
+                        {
+                            minimumPrice = 500001;
+                            maximumPrice = int.MaxValue;
+                        }
+
+                        //Find product in step 4, for pet in step 5
+
+                        switch (Storage[MsgId][4])
                         {
                             case "Đồ chơi":
-                            {
-
-                            }
+                                {
+                                    using (var toyDAO = new ToyDAO())
+                                    {
+                                        var messages = (await toyDAO.ReadAllChild())
+                                        .Include(x => x.Product)
+                                        .Include(x => x.Product.ProductForPetType)
+                                        .Where(x => x.Product.Price >= minimumPrice
+                                        && x.Product.Price <= maximumPrice
+                                        && x.Product.ProductForPetType.Any(y => y.PetType.Name == Storage[MsgId][5]))
+                                        .Select(x => new MessCard
+                                        {
+                                            type = 1,
+                                            platform = "facebook",
+                                            title = x.Product.Name,
+                                            subtitle = x.Product.Price.ToString(),
+                                            imageUrl = x.Product.ImgUrl,
+                                            buttons = new[]
+                                                {
+                                                    new Button
+                                                    {
+                                                        text = "Mua ngay",
+                                                        postback = x.ProductId
+                                                    }
+                                                }
+                                        }).ToArray();
+                                        if (!messages.Any())
+                                            return Receiver.Json(new
+                                            {
+                                                speech = "Xin lỗi bạn. Chúng mình tạm thời không còn bán loại hàng này."
+                                            });
+                                        return Receiver.Json(new
+                                        {
+                                            speech = "",
+                                            messages
+                                        });
+                                    }
+                                }
                         }
+
                         break;
                     }
 

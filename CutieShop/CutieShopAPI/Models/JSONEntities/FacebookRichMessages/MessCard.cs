@@ -1,26 +1,14 @@
 ﻿// ReSharper disable InconsistentNaming
-
 namespace CutieShop.API.Models.JSONEntities.FacebookRichMessages
 {
-    internal sealed class MessCard : FacebookRichMessage
+
+    public class MessCard
     {
-        public sealed class MessCardButton
-        {
-            internal string text { get; set; }
-            internal string postback { get; set; }
-        }
-
-        internal string title { get; set; }
-        internal string subtitle { get; set; }
-        internal string imageUrl { get; set; }
-        internal MessCardButton[] buttons { get; set; }
-
-        public MessCard(string title, string subtitle, string imageUrl, MessCardButton[] buttons)
-        {
-            this.title = title;
-            this.subtitle = subtitle;
-            this.imageUrl = imageUrl;
-            this.buttons = buttons;
-        }
+        public int type { get; set; }
+        public string platform { get; set; }
+        public string title { get; set; }
+        public string subtitle { get; set; }
+        public string imageUrl { get; set; }
+        public Button[] buttons { get; set; }
     }
 }
