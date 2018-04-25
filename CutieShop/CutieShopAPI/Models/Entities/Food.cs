@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace CutieShop.API.Models.Entities.Models.Entities
+﻿namespace CutieShop.API.Models.Entities
 {
-    public partial class Food
+    public class Food
     {
         public string ProductId { get; set; }
         public string NutritionId { get; set; }

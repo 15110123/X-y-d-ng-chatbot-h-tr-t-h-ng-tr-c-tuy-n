@@ -1,10 +1,11 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 // ReSharper disable InconsistentNaming
+// ReSharper disable TypeParameterCanBeVariant
 
 namespace CutieShop.API.Models.DAOs
 {
-    internal interface IDAO<in TID, TEntity>
+    internal interface IDAO<TID, TEntity>
     {
         Task<bool> Create(TEntity entity);
         Task<TEntity> Read(TID id);

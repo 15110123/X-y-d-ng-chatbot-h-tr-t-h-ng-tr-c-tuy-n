@@ -15,7 +15,6 @@ namespace CutieShop.API.Controllers
         public async Task<IActionResult> Index()
         {
             #region ReadJSON
-
             //var jsonData = await new StreamReader(Request.Body).ReadToEndAsync();
             //return Json(new {speech = jsonData});
             #endregion

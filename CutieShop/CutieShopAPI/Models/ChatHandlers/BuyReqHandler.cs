@@ -1,10 +1,13 @@
-﻿using CutieShop.API.Models.DAOs;
+﻿using System;
+using CutieShop.API.Models.DAOs;
 using CutieShop.API.Models.Exceptions;
 using CutieShop.API.Models.JSONEntities.FacebookRichMessages;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using CutieShop.API.Models.Entities;
+using CutieShop.API.Models.Helpers;
 
 // ReSharper disable InconsistentNaming
 
@@ -22,8 +25,8 @@ namespace CutieShop.API.Models.ChatHandlers
         {
             switch ((int)Request.result.contexts[0].lifespan)
             {
-                #region step 5
-                case 5:
+                #region step 6
+                case 6:
                     {
                         using (var petTypeDAO = new PetTypeDAO())
                         {
@@ -46,8 +49,8 @@ namespace CutieShop.API.Models.ChatHandlers
                         }
                     }
                 #endregion
-                #region Step 4
-                case 4:
+                #region Step 5
+                case 5:
                     {
                         Storage.AddOrUpdateToStorage(MsgId, 5, MsgReply);
                         return Receiver.Json(new
@@ -66,8 +69,8 @@ namespace CutieShop.API.Models.ChatHandlers
                         });
                     }
                 #endregion
-                #region Step 3
-                case 3:
+                #region Step 4
+                case 4:
                     {
                         Storage.AddOrUpdateToStorage(MsgId, 4, MsgReply);
                         return Receiver.Json(new
@@ -86,35 +89,33 @@ namespace CutieShop.API.Models.ChatHandlers
                         });
                     }
                 #endregion
+                #region Step 3
 
-                #region Step 2
-
-                case 2:
+                case 3:
                     {
                         Storage.AddOrUpdateToStorage(MsgId, 3, MsgReply);
 
                         //Find minimum and maximum price from step 3
                         int minimumPrice, maximumPrice;
 
-                        if (Storage[MsgId][3] == "<100000")
+                        switch (Storage[MsgId][3])
                         {
-                            minimumPrice = 0;
-                            maximumPrice = 99999;
-                        }
-                        else if (Storage[MsgId][3] == "100000 - 300000")
-                        {
-                            minimumPrice = 100000;
-                            maximumPrice = 300000;
-                        }
-                        else if (Storage[MsgId][3] == ">300000 - 500000")
-                        {
-                            minimumPrice = 300001;
-                            maximumPrice = 500000;
-                        }
-                        else
-                        {
-                            minimumPrice = 500001;
-                            maximumPrice = int.MaxValue;
+                            case "<100000":
+                                minimumPrice = 0;
+                                maximumPrice = 99999;
+                                break;
+                            case "100000 - 300000":
+                                minimumPrice = 100000;
+                                maximumPrice = 300000;
+                                break;
+                            case ">300000 - 500000":
+                                minimumPrice = 300001;
+                                maximumPrice = 500000;
+                                break;
+                            default:
+                                minimumPrice = 500001;
+                                maximumPrice = int.MaxValue;
+                                break;
                         }
 
                         //Find product in step 4, for pet in step 5
@@ -142,7 +143,7 @@ namespace CutieShop.API.Models.ChatHandlers
                                                 {
                                                     new Button
                                                     {
-                                                        text = "Mua ngay",
+                                                        text = "Đặt liền",
                                                         postback = x.ProductId
                                                     }
                                                 }
@@ -163,7 +164,59 @@ namespace CutieShop.API.Models.ChatHandlers
 
                         break;
                     }
+                #endregion
+                #region Step 2
+                case 2:
+                    {
+                        Storage.AddOrUpdateToStorage(MsgId, 2, MsgQuery);
+                        return Receiver.Json(new
+                        {
+                            speech = "Bạn có thể cho mình biết tên đăng nhập trên hệ thống Cutieshop được không ạ?"
+                        });
+                    }
+                #endregion
 
+                #region Step 1
+                case 1:
+                    {
+                        Storage.AddOrUpdateToStorage(MsgId, 1, MsgReply);
+                        using (var userDAO = new UserDAO())
+                        {
+                            var user = await userDAO.ReadChild(Storage[MsgId][1]);
+                            if (user == null)
+                            {
+                                throw new UnhandledChatException();
+                            }
+
+                            using (var onlineOrderProductDAO = new OnlineOrderProductDAO(userDAO.Context))
+                            {
+                                var orderId = new GuidHelper().CreateGuid();
+                                await onlineOrderProductDAO.Create(new OnlineOrder
+                                {
+                                    OnlineOrderId = orderId,
+                                    FirstName = user.FirstName,
+                                    LastName = user.LastName,
+                                    Address = user.Address,
+                                    PostCode = "10000",
+                                    City = user.City,
+                                    PhoneNo = "12345678",
+                                    Email = user.Email,
+                                    Date = DateTime.Now,
+                                    Username = user.Username,
+                                    StatusId = 0
+                                });
+                                await onlineOrderProductDAO.CreateChild(new OnlineOrderProduct
+                                {
+                                    ProductId = Storage[MsgId][2],
+                                    OnlineOrderId = orderId
+                                });
+                                return Receiver.Json(new
+                                {
+                                    speech = $"Mail xác nhận đã được gửi đến {user.Email}. Hãy xác nhận qua mail để hoàn tất đặt hàng nhé!"
+                                });
+                            }
+                        }
+                    }
                     #endregion
             }
             throw new UnhandledChatException();

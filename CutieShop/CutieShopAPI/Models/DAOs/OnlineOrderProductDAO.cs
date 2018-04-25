@@ -1,23 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CutieShop.API.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
-using CutieShop.API.Models.Entities;
 
 // ReSharper disable InconsistentNaming
 
 namespace CutieShop.API.Models.DAOs
 {
-    public sealed class PetDAO : ProductDAO, IChildDAO<string, Pet>
+    public sealed class OnlineOrderProductDAO : OnlineOrderDAO, IChildDAO<string, OnlineOrderProduct>
     {
-        public PetDAO(CutieshopContext context = null) : base(context)
+        public OnlineOrderProductDAO(CutieshopContext context = null) : base(context)
         {
         }
 
-        public async Task<bool> CreateChild(Pet childEntity)
+        public async Task<bool> CreateChild(OnlineOrderProduct childEntity)
         {
             try
             {
-                await Context.Pet.AddAsync(childEntity);
+                await Context.OnlineOrderProduct.AddAsync(childEntity);
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
@@ -26,11 +26,14 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public async Task<Pet> ReadChild(string id)
+        public async Task<OnlineOrderProduct> ReadChild(string id)
         {
             try
             {
-                return await Context.Pet.AsNoTracking().Include(x => x.Product).FirstOrDefaultAsync(x => x.ProductId == id);
+                return await Context.OnlineOrderProduct
+                    .AsNoTracking()
+                    .Include(x => x.OnlineOrder)
+                    .FirstOrDefaultAsync(x => x.ProductId == id);
             }
             catch
             {
@@ -38,11 +41,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public async Task<IQueryable<Pet>> ReadAllChild()
+        public async Task<IQueryable<OnlineOrderProduct>> ReadAllChild()
         {
             try
             {
-                return Context.Pet.AsNoTracking();
+                return Context.OnlineOrderProduct.AsNoTracking();
             }
             catch
             {
@@ -50,11 +53,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public async Task<bool> UpdateChild(Pet childEntity)
+        public async Task<bool> UpdateChild(OnlineOrderProduct childEntity)
         {
             try
             {
-                Context.Pet.Update(childEntity);
+                await Context.OnlineOrderProduct.AddAsync(childEntity);
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
@@ -67,7 +70,7 @@ namespace CutieShop.API.Models.DAOs
         {
             try
             {
-                Context.Pet.Remove(await ReadChild(id));
+                Context.OnlineOrderProduct.Remove(await ReadChild(id));
                 return await Context.SaveChangesAsync() != 0;
             }
             catch

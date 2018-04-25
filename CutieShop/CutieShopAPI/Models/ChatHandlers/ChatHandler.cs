@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CutieShop.API.Models.Helpers;
+﻿using CutieShop.API.Models.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using static CutieShop.API.Models.Utils.ChatRequestUtils;
 
 namespace CutieShop.API.Models.ChatHandlers
@@ -16,6 +13,7 @@ namespace CutieShop.API.Models.ChatHandlers
 
         protected string MsgId => GetMessengerSenderId(Request);
         protected string MsgReply => GetMessengerReply(Request);
+        protected string MsgQuery => GetMessengerResolvedQuery(Request);
 
         protected ChatHandler(Controller receiver, dynamic request)
         {

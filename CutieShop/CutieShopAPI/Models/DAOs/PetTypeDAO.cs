@@ -1,7 +1,7 @@
-﻿using CutieShop.API.Models.Entities.Models.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using CutieShop.API.Models.Entities;
 
 // ReSharper disable InconsistentNaming
 
@@ -9,6 +9,10 @@ namespace CutieShop.API.Models.DAOs
 {
     public sealed class PetTypeDAO : CutieshopDAO<string, PetType>
     {
+        public PetTypeDAO(CutieshopContext context = null) : base(context)
+        {
+        }
+
         public override async Task<bool> Create(PetType entity)
         {
             try

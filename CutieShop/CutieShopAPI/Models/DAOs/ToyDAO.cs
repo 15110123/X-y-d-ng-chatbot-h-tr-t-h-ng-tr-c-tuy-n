@@ -1,19 +1,22 @@
 ﻿// ReSharper disable InconsistentNaming
 
-using CutieShop.API.Models.Entities.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using CutieShop.API.Models.Entities;
 
 namespace CutieShop.API.Models.DAOs
 {
-    public class ToyDAO : ProductDAO<Toy>
+    public class ToyDAO : ProductDAO, IChildDAO<string, Toy>
     {
-        public override async Task<bool> CreateChild(Toy childEntity)
+        public ToyDAO(CutieshopContext context = null) : base(context)
+        {
+        }
+
+        public async Task<bool> CreateChild(Toy childEntity)
         {
             try
             {
-                if (!await Create(childEntity.Product)) return false;
                 await Context.Toy.AddAsync(childEntity);
                 return await Context.SaveChangesAsync() != 0;
             }
@@ -23,11 +26,14 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<Toy> ReadChild(string id)
+        public async Task<Toy> ReadChild(string id)
         {
             try
             {
-                return await Context.Toy.Include(x => x.Product).FirstAsync(x => x.ProductId == id);
+                return await Context.Toy
+                    .AsNoTracking()
+                    .Include(x => x.Product)
+                    .FirstOrDefaultAsync(x => x.ProductId == id);
             }
             catch
             {
@@ -35,7 +41,7 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<IQueryable<Toy>> ReadAllChild()
+        public async Task<IQueryable<Toy>> ReadAllChild()
         {
             try
             {
@@ -47,7 +53,7 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<bool> UpdateChild(Toy childEntity)
+        public async Task<bool> UpdateChild(Toy childEntity)
         {
             try
             {
@@ -60,7 +66,7 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<bool> DeleteChild(string id)
+        public async Task<bool> DeleteChild(string id)
         {
             try
             {

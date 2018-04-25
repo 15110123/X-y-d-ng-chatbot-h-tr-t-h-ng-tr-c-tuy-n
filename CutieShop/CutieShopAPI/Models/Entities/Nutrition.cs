@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace CutieShop.API.Models.Entities.Models.Entities
+namespace CutieShop.API.Models.Entities
 {
-    public partial class Nutrition
+    public class Nutrition
     {
         public Nutrition()
         {

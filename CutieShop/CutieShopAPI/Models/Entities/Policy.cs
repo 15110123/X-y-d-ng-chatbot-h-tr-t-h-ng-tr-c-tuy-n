@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace CutieShop.API.Models.Entities.Models.Entities
+﻿namespace CutieShop.API.Models.Entities
 {
-    public partial class Policy
+    public class Policy
     {
         public string Name { get; set; }
         public int? MinimumValue { get; set; }

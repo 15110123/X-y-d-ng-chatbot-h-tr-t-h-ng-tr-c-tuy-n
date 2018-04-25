@@ -7,17 +7,17 @@ using CutieShop.API.Models.Entities;
 
 namespace CutieShop.API.Models.DAOs
 {
-    public abstract class ProductDAO : CutieshopDAO<string, Product>
+    public abstract class AuthDAO : CutieshopDAO<string, Auth>
     {
-        protected ProductDAO(CutieshopContext context = null) : base(context)
+        protected AuthDAO(CutieshopContext context = null) : base(context)
         {
         }
 
-        public override async Task<bool> Create(Product entity)
+        public override async Task<bool> Create(Auth entity)
         {
             try
             {
-                await Context.Product.AddAsync(entity);
+                await Context.Auth.AddAsync(entity);
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
@@ -26,11 +26,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<Product> Read(string id)
+        public override async Task<Auth> Read(string id)
         {
             try
             {
-                return await Context.Product.FindAsync(id);
+                return await Context.Auth.FindAsync(id);
             }
             catch
             {
@@ -38,11 +38,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<IQueryable<Product>> ReadAll()
+        public override async Task<IQueryable<Auth>> ReadAll()
         {
             try
             {
-                return Context.Product.AsNoTracking();
+                return Context.Auth.AsNoTracking();
             }
             catch
             {
@@ -50,11 +50,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<bool> Update(Product entity)
+        public override async Task<bool> Update(Auth entity)
         {
             try
             {
-                Context.Product.Update(entity);
+                Context.Auth.Update(entity);
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
@@ -67,7 +67,7 @@ namespace CutieShop.API.Models.DAOs
         {
             try
             {
-                Context.Product.Remove(await Read(id));
+                Context.Auth.Remove(await Read(id));
                 return await Context.SaveChangesAsync() != 0;
             }
             catch

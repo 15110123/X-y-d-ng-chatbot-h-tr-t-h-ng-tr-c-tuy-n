@@ -1,23 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CutieShop.API.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
-using CutieShop.API.Models.Entities;
 
 // ReSharper disable InconsistentNaming
 
 namespace CutieShop.API.Models.DAOs
 {
-    public abstract class ProductDAO : CutieshopDAO<string, Product>
+    public sealed class UserDAO : AuthDAO, IChildDAO<string, User>
     {
-        protected ProductDAO(CutieshopContext context = null) : base(context)
+        public UserDAO(CutieshopContext context = null) : base(context)
         {
         }
 
-        public override async Task<bool> Create(Product entity)
+        public async Task<bool> CreateChild(User childEntity)
         {
             try
             {
-                await Context.Product.AddAsync(entity);
+                await Context.User.AddAsync(childEntity);
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
@@ -26,11 +26,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<Product> Read(string id)
+        public async Task<User> ReadChild(string id)
         {
             try
             {
-                return await Context.Product.FindAsync(id);
+                return await Context.User.AsNoTracking().FirstOrDefaultAsync(x => x.Username == id);
             }
             catch
             {
@@ -38,11 +38,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<IQueryable<Product>> ReadAll()
+        public async Task<IQueryable<User>> ReadAllChild()
         {
             try
             {
-                return Context.Product.AsNoTracking();
+                return Context.User.AsTracking();
             }
             catch
             {
@@ -50,11 +50,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<bool> Update(Product entity)
+        public async Task<bool> UpdateChild(User childEntity)
         {
             try
             {
-                Context.Product.Update(entity);
+                Context.User.Update(childEntity);
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
@@ -63,11 +63,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<bool> Delete(string id)
+        public async Task<bool> DeleteChild(string id)
         {
             try
             {
-                Context.Product.Remove(await Read(id));
+                Context.User.Remove(await ReadChild(id));
                 return await Context.SaveChangesAsync() != 0;
             }
             catch

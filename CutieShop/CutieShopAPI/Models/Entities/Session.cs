@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace CutieShop.API.Models.Entities.Models.Entities
+﻿namespace CutieShop.API.Models.Entities
 {
-    public partial class Session
+    public class Session
     {
         public string SessionId { get; set; }
         public string Username { get; set; }

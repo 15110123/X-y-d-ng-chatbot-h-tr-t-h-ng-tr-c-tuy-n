@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace CutieShop.API.Models.Entities.Models.Entities
+namespace CutieShop.API.Models.Entities
 {
-    public partial class Status
+    public class Status
     {
         public Status()
         {
             OnlineOrder = new HashSet<OnlineOrder>();
         }
 
-        public string StatusId { get; set; }
+        public int StatusId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
 

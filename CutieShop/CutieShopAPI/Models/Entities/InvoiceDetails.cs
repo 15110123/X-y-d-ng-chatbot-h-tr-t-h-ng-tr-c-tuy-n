@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace CutieShop.API.Models.Entities.Models.Entities
+﻿namespace CutieShop.API.Models.Entities
 {
-    public partial class InvoiceDetails
+    public class InvoiceDetails
     {
         public string InvoiceDetailId { get; set; }
         public string ProductName { get; set; }

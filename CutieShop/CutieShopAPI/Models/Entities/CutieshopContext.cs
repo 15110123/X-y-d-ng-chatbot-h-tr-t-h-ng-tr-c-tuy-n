@@ -1,10 +1,8 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace CutieShop.API.Models.Entities.Models.Entities
+namespace CutieShop.API.Models.Entities
 {
-    public partial class CutieshopContext : DbContext
+    public class CutieshopContext : DbContext
     {
         public virtual DbSet<Accessory> Accessory { get; set; }
         public virtual DbSet<Auth> Auth { get; set; }
@@ -345,11 +343,7 @@ namespace CutieShop.API.Models.Entities.Models.Entities
                     .HasMaxLength(10)
                     .IsUnicode(false);
 
-                entity.Property(e => e.StatusId)
-                    .IsRequired()
-                    .HasColumnName("StatusID")
-                    .HasMaxLength(36)
-                    .IsUnicode(false);
+                entity.Property(e => e.StatusId).HasColumnName("StatusID");
 
                 entity.Property(e => e.Username)
                     .IsRequired()
@@ -603,8 +597,6 @@ namespace CutieShop.API.Models.Entities.Models.Entities
             {
                 entity.Property(e => e.StatusId)
                     .HasColumnName("StatusID")
-                    .HasMaxLength(36)
-                    .IsUnicode(false)
                     .ValueGeneratedNever();
 
                 entity.Property(e => e.Description)

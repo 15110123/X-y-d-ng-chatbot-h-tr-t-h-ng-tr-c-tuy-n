@@ -1,23 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using CutieShop.API.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 // ReSharper disable InconsistentNaming
 
 namespace CutieShop.API.Models.DAOs
 {
-    public abstract class ProductDAO : CutieshopDAO<string, Product>
+    public abstract class OnlineOrderDAO : CutieshopDAO<string, OnlineOrder>
     {
-        protected ProductDAO(CutieshopContext context = null) : base(context)
+        protected OnlineOrderDAO(CutieshopContext context = null) : base(context)
         {
         }
 
-        public override async Task<bool> Create(Product entity)
+        public override async Task<bool> Create(OnlineOrder entity)
         {
             try
             {
-                await Context.Product.AddAsync(entity);
+                await Context.OnlineOrder.AddAsync(entity);
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
@@ -26,11 +26,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<Product> Read(string id)
+        public override async Task<OnlineOrder> Read(string id)
         {
             try
             {
-                return await Context.Product.FindAsync(id);
+                return await Context.OnlineOrder.AsNoTracking().FirstOrDefaultAsync(x => x.OnlineOrderId == id);
             }
             catch
             {
@@ -38,11 +38,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<IQueryable<Product>> ReadAll()
+        public override async Task<IQueryable<OnlineOrder>> ReadAll()
         {
             try
             {
-                return Context.Product.AsNoTracking();
+                return Context.OnlineOrder.AsNoTracking();
             }
             catch
             {
@@ -50,11 +50,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<bool> Update(Product entity)
+        public override async Task<bool> Update(OnlineOrder entity)
         {
             try
             {
-                Context.Product.Update(entity);
+                Context.OnlineOrder.Update(entity);
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
@@ -67,7 +67,7 @@ namespace CutieShop.API.Models.DAOs
         {
             try
             {
-                Context.Product.Remove(await Read(id));
+                Context.OnlineOrder.Remove(await Read(id));
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
