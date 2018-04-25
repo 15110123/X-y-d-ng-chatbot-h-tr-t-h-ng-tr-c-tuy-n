@@ -48,11 +48,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<IEnumerable<PetType>> ReadAll(string id)
+        public override async Task<IEnumerable<PetType>> ReadAll()
         {
             try
             {
-                return Context.PetType.AsNoTracking().Where(x => x.PetTypeId == id);
+                return Context.PetType.AsNoTracking();
             }
             catch
             {

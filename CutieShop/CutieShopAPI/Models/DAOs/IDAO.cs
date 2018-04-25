@@ -8,7 +8,7 @@ namespace CutieShop.API.Models.DAOs
     {
         Task<bool> Create(TEntity entity);
         Task<TEntity> Read(TID id);
-        Task<IEnumerable<TEntity>> ReadAll(TID id);
+        Task<IEnumerable<TEntity>> ReadAll();
         Task<bool> Update(TEntity entity);
         Task<bool> Delete(TID id);
     }

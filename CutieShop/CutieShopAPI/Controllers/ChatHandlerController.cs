@@ -1,6 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using CutieShop.API.Models.ChatHandlers;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -22,57 +23,24 @@ namespace CutieShop.API.Controllers
             {
                 dynamic request = JsonConvert.DeserializeObject(await new StreamReader(Request.Body).ReadToEndAsync());
 
-                if (request.result.contexts[0].name == "buystep")
+                try
                 {
-                    switch ((int)request.result.contexts[0].lifespan)
+                    if (request.result.contexts[0].name == "buystep")
                     {
-                        case 5:
-                            {
-                                return Json(new
-                                {
-                                    speech = "",
-                                    messages = new[]
-                                    {
-                                new
-                                {
-                                    type = 2,
-                                    platform = "facebook",
-                                    title = "Bạn muốn sản phẩm cho thú cưng nào ạ?",
-                                    replies = new[] {"Hamster", "Nhím", "Bò sát", "Chó"}
-                                } }
-                                });
-                            }
-                        case 4:
-                            {
-                                if (request.result.resolvedQuery == "Nhím")
-                                {
-
-                                    return Json(new
-                                    {
-                                        speech = "",
-                                        messages = new[]
-                                        {
-                                        new
-                                        {
-                                            type = 2,
-                                            platform = "facebook",
-                                            title = "Bạn muốn mua gì cho bé ạ?",
-                                            replies = new[] {"Đồ chơi", "Thức ăn", "Lồng"}
-                                        } }
-                                    });
-                                }
-
-                                return Json(new { });
-                            }
+                        return await new BuyReqHandler(this, request).Result();
                     }
                 }
-
+                catch (Exception e)
+                {
+                    // ReSharper disable once PossibleIntendedRethrow
+                    return Json(new { speech = e.Message + e.StackTrace });
+                }
                 return Json(new
                 {
                     speech = "CutieBot chưa hiểu câu hỏi của bạn. Xin hãy đợi nhân viên chúng mình tiếp nhận để trả lời bạn sớm nhất"
                 });
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 return Json(new { speech = e.Message + e.StackTrace });
             }

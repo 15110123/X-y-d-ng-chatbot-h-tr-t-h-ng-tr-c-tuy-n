@@ -1,22 +1,20 @@
-﻿using CutieShop.API.Models.Entities.Models.Entities;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿// ReSharper disable InconsistentNaming
 
-// ReSharper disable InconsistentNaming
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using CutieShop.API.Models.Entities.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CutieShop.API.Models.DAOs
 {
-    public sealed class PetDAO : ProductDAO<Pet>
+    public class ToyDAO : ProductDAO<Toy>
     {
-        public override async Task<bool> CreateChild(Pet childEntity)
+        public override async Task<bool> CreateChild(Toy childEntity)
         {
             try
             {
-                //Get the result of creating the product
                 if (!await Create(childEntity.Product)) return false;
-                await Context.Pet.AddAsync(childEntity);
+                await Context.Toy.AddAsync(childEntity);
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
@@ -25,11 +23,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<Pet> ReadChild(string id)
+        public override async Task<Toy> ReadChild(string id)
         {
             try
             {
-                return await Context.Pet.FindAsync(id);
+                return await Context.Toy.FindAsync(id);
             }
             catch
             {
@@ -37,11 +35,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<IEnumerable<Pet>> ReadAllChild()
+        public override async Task<IEnumerable<Toy>> ReadAllChild()
         {
             try
             {
-                return Context.Pet.AsNoTracking();
+                return Context.Toy.AsNoTracking();
             }
             catch
             {
@@ -49,11 +47,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<bool> UpdateChild(Pet childEntity)
+        public override async Task<bool> UpdateChild(Toy childEntity)
         {
             try
             {
-                Context.Pet.Update(childEntity);
+                Context.Toy.Update(childEntity);
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
@@ -66,7 +64,7 @@ namespace CutieShop.API.Models.DAOs
         {
             try
             {
-                Context.Pet.Remove(await ReadChild(id));
+                Context.Toy.Remove(await ReadChild(id));
                 return await Context.SaveChangesAsync() != 0;
             }
             catch

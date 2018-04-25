@@ -3,7 +3,7 @@ using System.IO;
 
 namespace CutieShop.API.Models.Utils
 {
-    public static class FileUtil
+    public static class FileUtils
     {
         public static Stream AsStream(this byte[] byteArray) => new MemoryStream(byteArray);
 

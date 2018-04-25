@@ -20,7 +20,7 @@ namespace CutieShop.API.Models.DAOs
 
         public abstract Task<TEntity> Read(TID id);
 
-        public abstract Task<IEnumerable<TEntity>> ReadAll(TID id);
+        public abstract Task<IEnumerable<TEntity>> ReadAll();
 
         public abstract Task<bool> Update(TEntity entity);
 

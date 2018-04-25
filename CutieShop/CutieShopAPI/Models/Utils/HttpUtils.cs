@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace CutieShop.API.Models.Utils
 {
-    public static class HttpUtil
+    public static class HttpUtils
     {
         public static async Task<Stream> GetStreamFromUrl(string url)
         {

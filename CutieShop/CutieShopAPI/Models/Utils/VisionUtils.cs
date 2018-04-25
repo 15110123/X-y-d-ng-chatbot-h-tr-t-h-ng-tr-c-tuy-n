@@ -12,7 +12,7 @@ namespace CutieShop.API.Models.Utils
     /// <summary>
     /// Class for vision-related methods
     /// </summary>
-    public sealed class VisionUtil
+    public sealed class VisionUtils
     {
         private readonly HttpClient _httpClient = new HttpClient();
 
@@ -21,7 +21,7 @@ namespace CutieShop.API.Models.Utils
         /// 
         /// </summary>
         /// <param name="azureSettings">Contains Azure's settings</param>
-        public VisionUtil(AzureSettings azureSettings)
+        public VisionUtils(AzureSettings azureSettings)
         {
             _azureSettings = azureSettings;
 
@@ -44,7 +44,7 @@ namespace CutieShop.API.Models.Utils
             var uri = _azureSettings.Vision.Endpoint + "?" + requestParameters;
 
             // Request body. Posts a locally stored JPEG image.
-            var byteData = (await HttpUtil.GetBytesFromUrl(imageUrl)).ToArray();
+            var byteData = (await HttpUtils.GetBytesFromUrl(imageUrl)).ToArray();
 
             using (var content = new ByteArrayContent(byteData))
             {

@@ -21,7 +21,7 @@ namespace CutieShop.API.Controllers
         [HttpPost]
         public async Task<JsonResult> Index(string imageUrl)
         {
-            var visionUtil = new VisionUtil(_azureSettings);
+            var visionUtil = new VisionUtils(_azureSettings);
             return Json(await visionUtil.GetResult(imageUrl));
         }
 
@@ -31,7 +31,7 @@ namespace CutieShop.API.Controllers
             using (var stream = new MemoryStream())
             {
                 await imgFile.CopyToAsync(stream);
-                var visionUtil = new VisionUtil(_azureSettings);
+                var visionUtil = new VisionUtils(_azureSettings);
                 return Json(await visionUtil.GetResult(stream));
             }
         }

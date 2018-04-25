@@ -39,11 +39,11 @@ namespace CutieShop.API.Models.DAOs
 
         public abstract Task<TChildEntity> ReadChild(string id);
 
-        public override async Task<IEnumerable<Product>> ReadAll(string id)
+        public override async Task<IEnumerable<Product>> ReadAll()
         {
             try
             {
-                return Context.Product.AsNoTracking().Where(x => x.ProductId == id);
+                return Context.Product.AsNoTracking();
             }
             catch
             {
@@ -51,7 +51,7 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public abstract Task<IEnumerable<TChildEntity>> ReadAllChild(string id);
+        public abstract Task<IEnumerable<TChildEntity>> ReadAllChild();
 
         public override async Task<bool> Update(Product entity)
         {
