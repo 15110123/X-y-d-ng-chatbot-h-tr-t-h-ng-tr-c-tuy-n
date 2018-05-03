@@ -15,12 +15,16 @@ namespace Testing.DB
             using (var toyDAO = new ToyDAO())
             {
                 var data = toyDAO.ReadAllChild().Result;
+                //var result = data
+                //    .Include(x => x.Product)
+                //    .Include(x => x.Product.ProductForPetType)
+                //    .Where(x => x.Product.Price >= 0
+                //                && x.Product.Price <= 99999
+                //                && x.Product.ProductForPetType.Any(y => y.PetType.Name == "Thỏ"));
+
                 var result = data
                     .Include(x => x.Product)
-                    .Include(x => x.Product.ProductForPetType)
-                    .Where(x => x.Product.Price >= 0
-                                && x.Product.Price <= 99999
-                                && x.Product.ProductForPetType.Any(y => y.PetType.Name == "Thỏ"));
+                    .Include(x => x.Product.ProductForPetType);
 
                 //foreach (var ele in data)
                 //{
@@ -29,7 +33,7 @@ namespace Testing.DB
 
                 foreach (var ele in result)
                 {
-                    Console.WriteLine(ele.ProductId);
+                    Console.WriteLine(ele.Product.Name);
                 }
 
                 Console.WriteLine("Hello World!");

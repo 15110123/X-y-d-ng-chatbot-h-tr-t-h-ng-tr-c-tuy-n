@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CutieShop.API.Models.Entities;
 using CutieShop.API.Models.Helpers;
+using CutieShop.API.Models.JSONEntities.Settings;
 
 // ReSharper disable InconsistentNaming
 
@@ -15,10 +16,12 @@ namespace CutieShop.API.Models.ChatHandlers
 {
     internal class BuyReqHandler : ChatHandler
     {
-        public BuyReqHandler(Controller receiver, dynamic request)
+        private readonly MailContent _mailContent;
+
+        public BuyReqHandler(Controller receiver, dynamic request, MailContent mailContent)
             : base(receiver, (object)request)
         {
-
+            _mailContent = mailContent;
         }
 
         public override async Task<IActionResult> Result()
@@ -175,7 +178,6 @@ namespace CutieShop.API.Models.ChatHandlers
                         });
                     }
                 #endregion
-
                 #region Step 1
                 case 1:
                     {

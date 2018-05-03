@@ -1,16 +1,24 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using CutieShop.API.Models.ChatHandlers;
-using CutieShop.API.Models.JSONEntities.FacebookRichMessages;
+﻿using CutieShop.API.Models.ChatHandlers;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using CutieShop.API.Models.JSONEntities.Settings;
+using Microsoft.Extensions.Options;
 
 namespace CutieShop.API.Controllers
 {
     [Route("api/[controller]")]
     public class ChatHandlerController : Controller
     {
+        private readonly MailContent _mailContent;
+
+        public ChatHandlerController(IOptions<MailContent> mailContent)
+        {
+            _mailContent = mailContent.Value;
+        }
+
         [HttpPost]
         public async Task<IActionResult> Index()
         {
@@ -28,7 +36,7 @@ namespace CutieShop.API.Controllers
                 {
                     if (request.result.contexts[0].name == "buystep")
                     {
-                        return await new BuyReqHandler(this, request).Result();
+                        return await new BuyReqHandler(this, request, _mailContent).Result();
                     }
                 }
                 catch (Exception e)

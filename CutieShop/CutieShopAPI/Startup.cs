@@ -21,6 +21,7 @@ namespace CutieShop.API
             services.AddCors();
             services.AddMvc();
             services.Configure<AzureSettings>(Configuration.GetSection("AzureSettings"));
+            services.Configure<MailContent>(Configuration.GetSection("MailContent"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
