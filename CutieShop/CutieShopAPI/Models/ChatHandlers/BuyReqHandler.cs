@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using CutieShop.API.Models.Entities;
 using CutieShop.API.Models.Helpers;
 using CutieShop.API.Models.JSONEntities.Settings;
+using CutieShop.API.Models.Utils;
+#pragma warning disable 4014
 
 // ReSharper disable InconsistentNaming
 
@@ -17,6 +19,7 @@ namespace CutieShop.API.Models.ChatHandlers
     internal class BuyReqHandler : ChatHandler
     {
         private readonly MailContent _mailContent;
+        private bool _isSkipValidation;
 
         public BuyReqHandler(Controller receiver, dynamic request, MailContent mailContent)
             : base(receiver, (object)request)
@@ -26,11 +29,14 @@ namespace CutieShop.API.Models.ChatHandlers
 
         public override async Task<IActionResult> Result()
         {
-            switch ((int)Request.result.contexts[0].lifespan)
+            var currentStep = Storage.GetCurrentStep(MsgId);
+
+            switch (currentStep + 1)
             {
-                #region step 6
-                case 6:
+                #region step 1
+                case 1:
                     {
+                        Storage.AddOrUpdateToStorage(MsgId, 1, null);
                         using (var petTypeDAO = new PetTypeDAO())
                         {
                             return Receiver.Json(new
@@ -52,10 +58,26 @@ namespace CutieShop.API.Models.ChatHandlers
                         }
                     }
                 #endregion
-                #region Step 5
-                case 5:
+                #region Step 2
+                case 2:
                     {
-                        Storage.AddOrUpdateToStorage(MsgId, 5, MsgReply);
+                        //Check if answer is valid
+                        if (!_isSkipValidation)
+                        {
+                            using (var petTypeDAO = new PetTypeDAO())
+                            {
+                                if (await (await petTypeDAO.ReadAll())
+                                    .Select(x => x.Name)
+                                    .AllAsync(x => x != MsgReply))
+                                {
+                                    _isSkipValidation = true;
+                                    goto case 1;
+                                }
+                            }
+                        }
+
+                        Storage.AddOrUpdateToStorage(MsgId, 2, null);
+                        Storage.AddOrUpdateToStorage(MsgId, 1, MsgReply);
                         return Receiver.Json(new
                         {
                             speech = "",
@@ -72,10 +94,21 @@ namespace CutieShop.API.Models.ChatHandlers
                         });
                     }
                 #endregion
-                #region Step 4
-                case 4:
+                #region Step 3
+                case 3:
                     {
-                        Storage.AddOrUpdateToStorage(MsgId, 4, MsgReply);
+                        //Check if answer is valid
+                        if (!_isSkipValidation)
+                        {
+                            if (new[] { "Đồ chơi", "Thức ăn", "Lồng", "phụ kiện" }.All(x => x != MsgReply))
+                            {
+                                _isSkipValidation = true;
+                                goto case 2;
+                            }
+                        }
+
+                        Storage.AddOrUpdateToStorage(MsgId, 3, null);
+                        Storage.AddOrUpdateToStorage(MsgId, 2, MsgReply);
                         return Receiver.Json(new
                         {
                             speech = "",
@@ -92,10 +125,22 @@ namespace CutieShop.API.Models.ChatHandlers
                         });
                     }
                 #endregion
-                #region Step 3
+                #region Step 4
 
-                case 3:
+                case 4:
                     {
+                        //Check if answer is valid
+                        if (!_isSkipValidation)
+                        {
+                            if (new[] { "<100000", "100000 - 300000", ">300000 - 500000", ">500000" }.All(x =>
+                                  x != MsgReply))
+                            {
+                                _isSkipValidation = true;
+                                goto case 3;
+                            }
+                        }
+
+                        Storage.AddOrUpdateToStorage(MsgId, 4, null);
                         Storage.AddOrUpdateToStorage(MsgId, 3, MsgReply);
 
                         //Find minimum and maximum price from step 3
@@ -121,70 +166,58 @@ namespace CutieShop.API.Models.ChatHandlers
                                 break;
                         }
 
-                        //Find product in step 4, for pet in step 5
-
-                        switch (Storage[MsgId][4])
+                        //Find product in step 2, for pet in step 1
+                        dynamic dao;
+                        switch (Storage[MsgId][2])
                         {
                             case "Đồ chơi":
                                 {
-                                    using (var toyDAO = new ToyDAO())
-                                    {
-                                        var messages = (await toyDAO.ReadAllChild())
-                                        .Include(x => x.Product)
-                                        .Include(x => x.Product.ProductForPetType)
-                                        .Where(x => x.Product.Price >= minimumPrice
-                                        && x.Product.Price <= maximumPrice
-                                        && x.Product.ProductForPetType.Any(y => y.PetType.Name == Storage[MsgId][5]))
-                                        .Select(x => new MessCard
-                                        {
-                                            type = 1,
-                                            platform = "facebook",
-                                            title = x.Product.Name,
-                                            subtitle = x.Product.Price.ToString(),
-                                            imageUrl = x.Product.ImgUrl,
-                                            buttons = new[]
-                                                {
-                                                    new Button
-                                                    {
-                                                        text = "Đặt liền",
-                                                        postback = x.ProductId
-                                                    }
-                                                }
-                                        }).ToArray();
-                                        if (!messages.Any())
-                                            return Receiver.Json(new
-                                            {
-                                                speech = "Xin lỗi bạn. Chúng mình tạm thời không còn bán loại hàng này."
-                                            });
-                                        return Receiver.Json(new
-                                        {
-                                            speech = "",
-                                            messages
-                                        });
-                                    }
+                                    dao = new ToyDAO();
+                                    break;
+                                }
+                            case "Thức ăn":
+                                {
+
+                                    break;
                                 }
                         }
 
                         break;
                     }
                 #endregion
-                #region Step 2
-                case 2:
+                #region Step 5
+                case 5:
                     {
-                        Storage.AddOrUpdateToStorage(MsgId, 2, MsgQuery);
+                        //Check if answer is valid
+                        if (!_isSkipValidation)
+                        {
+                            using (var productDAO = new ProductDAO())
+                            {
+                                if (await productDAO.Read(MsgQuery) == null)
+                                {
+                                    _isSkipValidation = true;
+                                    goto case 4;
+                                }
+                            }
+                        }
+
+                        Storage.AddOrUpdateToStorage(MsgId, 5, null);
+                        Storage.AddOrUpdateToStorage(MsgId, 4, MsgQuery);
                         return Receiver.Json(new
                         {
-                            speech = "Bạn có thể cho mình biết tên đăng nhập trên hệ thống Cutieshop được không ạ?"
+                            speech = "Bạn có thể cho mình biết tên đăng nhập trên hệ thống Cutieshop được không ạ?\nNếu không có, bạn có thể gõ tên đăng nhập mới để chúng mình tạo tài khoản cho bạn"
                         });
                     }
                 #endregion
-                #region Step 1
-                case 1:
+                #region Step 6
+
+                case 6:
                     {
-                        Storage.AddOrUpdateToStorage(MsgId, 1, MsgReply);
+                        Storage.AddOrUpdateToStorage(MsgId, 6, null);
+                        Storage.AddOrUpdateToStorage(MsgId, 5, MsgReply);
                         using (var userDAO = new UserDAO())
                         {
-                            var user = await userDAO.ReadChild(Storage[MsgId][1]);
+                            var user = await userDAO.ReadChild(Storage[MsgId][5]);
                             if (user == null)
                             {
                                 throw new UnhandledChatException();
@@ -209,18 +242,26 @@ namespace CutieShop.API.Models.ChatHandlers
                                 });
                                 await onlineOrderProductDAO.CreateChild(new OnlineOrderProduct
                                 {
-                                    ProductId = Storage[MsgId][2],
+                                    ProductId = Storage[MsgId][4],
                                     OnlineOrderId = orderId
                                 });
+                                MailUtils.Send(user.Email, _mailContent.BuyReq.Subject, _mailContent.BuyReq.Body);
+
+                                Storage.RemoveId(MsgId);
+
                                 return Receiver.Json(new
                                 {
-                                    speech = $"Mail xác nhận đã được gửi đến {user.Email}. Hãy xác nhận qua mail để hoàn tất đặt hàng nhé!"
+                                    speech =
+                                        $"Mail xác nhận đã được gửi đến {user.Email}. Hãy xác nhận qua mail để hoàn tất đặt hàng nhé!"
                                 });
                             }
                         }
                     }
+
                     #endregion
             }
+
+            Storage.RemoveId(MsgId);
             throw new UnhandledChatException();
         }
     }

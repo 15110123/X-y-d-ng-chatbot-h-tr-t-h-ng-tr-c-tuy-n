@@ -1,4 +1,5 @@
-﻿using CutieShop.API.Models.Helpers;
+﻿using System.Collections.Generic;
+using CutieShop.API.Models.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using static CutieShop.API.Models.Utils.ChatRequestUtils;

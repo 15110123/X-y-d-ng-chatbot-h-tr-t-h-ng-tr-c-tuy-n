@@ -4,8 +4,10 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using CutieShop.API.Models.Helpers;
 using CutieShop.API.Models.JSONEntities.Settings;
 using Microsoft.Extensions.Options;
+using static CutieShop.API.Models.Utils.ChatRequestUtils;
 
 namespace CutieShop.API.Controllers
 {
@@ -29,12 +31,20 @@ namespace CutieShop.API.Controllers
 
             try
             {
-
-                dynamic request = JsonConvert.DeserializeObject(await new StreamReader(Request.Body).ReadToEndAsync());
+                var jsonString = await new StreamReader(Request.Body).ReadToEndAsync();
+                dynamic request = JsonConvert.DeserializeObject(jsonString);
 
                 try
                 {
-                    if (request.result.contexts[0].name == "buystep")
+                    //Check if cancel request
+                    if (request.result.metadata.intentName == "shop.test.api.BuyReq.cancel")
+                    {
+                        SessionStorageHelper.RemoveAllById(GetMessengerSenderId(request));
+                        return Json(new{});
+                    }
+
+                    if (request.result.resolvedQuery == "test api" ||
+                        request.result.contexts[0].name == "buystep")
                     {
                         return await new BuyReqHandler(this, request, _mailContent).Result();
                     }
@@ -42,7 +52,7 @@ namespace CutieShop.API.Controllers
                 catch (Exception e)
                 {
                     // ReSharper disable once PossibleIntendedRethrow
-                    return Json(new { speech = e.Message + e.StackTrace });
+                    return Json(new { speech = e.Message + e.StackTrace + jsonString });
                 }
                 return Json(new
                 {

@@ -7,9 +7,9 @@ using CutieShop.API.Models.Entities;
 
 namespace CutieShop.API.Models.DAOs
 {
-    public abstract class ProductDAO : CutieshopDAO<string, Product>
+    public class ProductDAO : CutieshopDAO<string, Product>
     {
-        protected ProductDAO(CutieshopContext context = null) : base(context)
+        public ProductDAO(CutieshopContext context = null) : base(context)
         {
         }
 

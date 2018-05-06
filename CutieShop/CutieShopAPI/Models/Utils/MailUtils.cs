@@ -1,11 +1,12 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using System.Threading.Tasks;
 
 namespace CutieShop.API.Models.Utils
 {
     public static class MailUtils
     {
-        public static void Send(string userId, string email, string subject, string body)
+        public static async Task Send(string email, string subject, string body)
         {
             var mail = new MailMessage();
             var client = new SmtpClient("mail.smtp2go.com", 2525) //Port 8025, 587 and 25 can also be used.
@@ -17,10 +18,10 @@ namespace CutieShop.API.Models.Utils
             mail.To.Add(email);
             mail.Subject = subject;
             var htmlView = AlternateView.CreateAlternateViewFromString(body, null, "text/html");
-            var plainView = AlternateView.CreateAlternateViewFromString(subject, null, "text/plain");
+            //var plainView = AlternateView.CreateAlternateViewFromString(body, null, "text/plain");
             mail.AlternateViews.Add(htmlView);
-            mail.AlternateViews.Add(plainView);
-            client.Send(mail);
+            //mail.AlternateViews.Add(plainView);
+            await client.SendMailAsync(mail);
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using CutieShop.API.Models.ChatHandlers;
 using System.Collections.Generic;
+using System.Linq;
+
 // ReSharper disable CollectionNeverUpdated.Local
 
 namespace CutieShop.API.Models.Helpers
@@ -48,7 +50,7 @@ namespace CutieShop.API.Models.Helpers
             else Storage[_chatHandler.GetType()][id][step] = value;
         }
 
-        public void RemoveAllFromStorage(string id, int step)
+        public void RemoveStep(string id, int step)
         {
             if (!Storage[_chatHandler.GetType()].ContainsKey(id)) return;
             Storage[_chatHandler.GetType()][id].Remove(step);
@@ -57,5 +59,25 @@ namespace CutieShop.API.Models.Helpers
         private void AddId(string id)
             => Storage[_chatHandler.GetType()]
                 .Add(id, new Dictionary<int, string>());
+
+        public void RemoveId(string id)
+            => Storage[_chatHandler.GetType()].Remove(id);
+
+        public int GetCurrentStep(string id)
+        {
+            if (!Storage.ContainsKey(_chatHandler.GetType()) ||
+                !Storage[_chatHandler.GetType()].ContainsKey(id) ||
+                Storage[_chatHandler.GetType()][id].Keys.Count <= 0) return 0;
+            return Storage[_chatHandler.GetType()][id].Keys
+                .Max();
+        }
+
+        public static void RemoveAllById(string id)
+        {
+            foreach (var dctType in Storage.Keys)
+            {
+                Storage[dctType].Remove(id);
+            }
+        }
     }
 }
