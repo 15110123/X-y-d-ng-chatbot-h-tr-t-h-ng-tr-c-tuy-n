@@ -43,6 +43,7 @@ namespace CutieShop.API.Controllers
                         return Json(new{});
                     }
 
+                    //Buy request
                     if (request.result.resolvedQuery == "test api" ||
                         request.result.contexts[0].name == "buystep")
                     {

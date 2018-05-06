@@ -1,23 +1,23 @@
 ﻿// ReSharper disable InconsistentNaming
 
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using CutieShop.API.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CutieShop.API.Models.DAOs
 {
-    public class ToyDAO : ProductDAO, IChildDAO<string, Toy>
+    public sealed class CageDAO : ProductDAO, IChildDAO<string, Cage>
     {
-        public ToyDAO(CutieshopContext context = null) : base(context)
+        public CageDAO(CutieshopContext context = null) : base(context)
         {
         }
 
-        public async Task<bool> CreateChild(Toy childEntity)
+        public async Task<bool> CreateChild(Cage childEntity)
         {
             try
             {
-                await Context.Toy.AddAsync(childEntity);
+                await Context.Cage.AddAsync(childEntity);
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
@@ -26,13 +26,15 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public async Task<Toy> ReadChild(string id)
+        public async Task<Cage> ReadChild(string id)
         {
             try
             {
-                return await Context.Toy
+                return await Context.Cage
                     .AsNoTracking()
                     .Include(x => x.Product)
+                    .Include(x => x.Origin)
+                    .Include(x => x.Material)
                     .FirstOrDefaultAsync(x => x.ProductId == id);
             }
             catch
@@ -41,13 +43,15 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public async Task<IQueryable<Toy>> ReadAllChild()
+        public async Task<IQueryable<Cage>> ReadAllChild()
         {
             try
             {
-                return Context.Toy
+                return Context.Cage
                     .AsNoTracking()
-                    .Include(x => x.Product);
+                    .Include(x => x.Product)
+                    .Include(x => x.Origin)
+                    .Include(x => x.Material);
             }
             catch
             {
@@ -55,11 +59,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public async Task<bool> UpdateChild(Toy childEntity)
+        public async Task<bool> UpdateChild(Cage childEntity)
         {
             try
             {
-                Context.Toy.Update(childEntity);
+                Context.Cage.Update(childEntity);
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
@@ -72,7 +76,7 @@ namespace CutieShop.API.Models.DAOs
         {
             try
             {
-                Context.Toy.Remove(await ReadChild(id));
+                Context.Cage.Remove(await ReadChild(id));
                 return await Context.SaveChangesAsync() != 0;
             }
             catch

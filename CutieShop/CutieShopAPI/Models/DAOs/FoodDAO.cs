@@ -1,23 +1,23 @@
 ﻿// ReSharper disable InconsistentNaming
 
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using CutieShop.API.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CutieShop.API.Models.DAOs
 {
-    public class ToyDAO : ProductDAO, IChildDAO<string, Toy>
+    public sealed class FoodDAO : ProductDAO, IChildDAO<string, Food>
     {
-        public ToyDAO(CutieshopContext context = null) : base(context)
+        public FoodDAO(CutieshopContext context = null) : base(context)
         {
         }
 
-        public async Task<bool> CreateChild(Toy childEntity)
+        public async Task<bool> CreateChild(Food childEntity)
         {
             try
             {
-                await Context.Toy.AddAsync(childEntity);
+                await Context.Food.AddAsync(childEntity);
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
@@ -26,13 +26,14 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public async Task<Toy> ReadChild(string id)
+        public async Task<Food> ReadChild(string id)
         {
             try
             {
-                return await Context.Toy
+                return await Context.Food
                     .AsNoTracking()
                     .Include(x => x.Product)
+                    .Include(x => x.Nutrition)
                     .FirstOrDefaultAsync(x => x.ProductId == id);
             }
             catch
@@ -41,13 +42,14 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public async Task<IQueryable<Toy>> ReadAllChild()
+        public async Task<IQueryable<Food>> ReadAllChild()
         {
             try
             {
-                return Context.Toy
+                return Context.Food
                     .AsNoTracking()
-                    .Include(x => x.Product);
+                    .Include(x => x.Product)
+                    .Include(x => x.Nutrition);
             }
             catch
             {
@@ -55,11 +57,11 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public async Task<bool> UpdateChild(Toy childEntity)
+        public async Task<bool> UpdateChild(Food childEntity)
         {
             try
             {
-                Context.Toy.Update(childEntity);
+                Context.Food.Update(childEntity);
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
@@ -72,7 +74,7 @@ namespace CutieShop.API.Models.DAOs
         {
             try
             {
-                Context.Toy.Remove(await ReadChild(id));
+                Context.Food.Remove(await ReadChild(id));
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
