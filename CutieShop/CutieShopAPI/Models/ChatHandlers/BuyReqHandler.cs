@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using CutieShop.API.Models.Utils;
 
 #pragma warning disable 4014
 
@@ -214,10 +215,11 @@ namespace CutieShop.API.Models.ChatHandlers
                             //If user is null, create a user, then ask customer their email
                             if (user == null)
                             {
+                                Storage.AddOrUpdateToStorage(MsgId, 6, "userPassword", new GuidHelper().CreateGuid());
                                 await userDAO.Create(new Auth
                                 {
                                     Username = Storage[MsgId, 5],
-                                    Password = new GuidHelper().CreateGuid()
+                                    Password = Storage[MsgId, 6, "userPassword"]
                                 });
                                 await userDAO.CreateChild(new User
                                 {
@@ -304,15 +306,23 @@ namespace CutieShop.API.Models.ChatHandlers
                                     .Replace("{1}", mailProductTable)
                                     .Replace("{2}", "http://cutieshopapi.azurewebsites.net/verify?id=" + orderId);
 
-                                //MailUtils.Send(user.Email, _mailContent.BuyReq.Subject, mailBody);
+                                MailUtils.Send(user.Email, _mailContent.BuyReq.Subject, mailBody);
+
+                                var reply =
+                                    $"Mail xác nhận đã được gửi đến {user.Email}. Hãy xác nhận qua mail để hoàn tất đặt hàng nhé!";
+
+                                //Send temporary password if customer create new account
+                                if (Storage[MsgId, 6, "userPassword"] != null)
+                                {
+                                    reply = $"Password tạm thời của bạn là {Storage[MsgId, 6, "userPassword"]}. Bạn nên vào trang chủ để thay đổi mật khẩu mặc định\n" + reply;
+                                }
 
                                 //Remove data in storage
                                 Storage.RemoveId(MsgId);
 
                                 return Receiver.Json(new
                                 {
-                                    speech =
-                                        $"Mail xác nhận đã được gửi đến {user.Email}. Hãy xác nhận qua mail để hoàn tất đặt hàng nhé!"
+                                    speech = reply
                                 });
                             }
                         }
