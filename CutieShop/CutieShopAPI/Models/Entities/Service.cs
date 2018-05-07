@@ -2,7 +2,7 @@
 
 namespace CutieShop.API.Models.Entities
 {
-    public class Service
+    public partial class Service
     {
         public string ProductId { get; set; }
         public int StartDayOfWeek { get; set; }

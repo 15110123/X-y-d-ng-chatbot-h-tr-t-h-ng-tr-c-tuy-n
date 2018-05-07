@@ -1,6 +1,6 @@
 ﻿namespace CutieShop.API.Models.Entities
 {
-    public class Session
+    public partial class Session
     {
         public string SessionId { get; set; }
         public string Username { get; set; }

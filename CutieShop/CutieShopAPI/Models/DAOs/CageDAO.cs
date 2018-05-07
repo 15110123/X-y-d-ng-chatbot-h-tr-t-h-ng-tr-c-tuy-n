@@ -26,16 +26,22 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public async Task<Cage> ReadChild(string id)
+        public async Task<Cage> ReadChild(string id, bool isTracking)
         {
             try
             {
+                if (isTracking)
+                    return await Context.Cage
+                                        .Include(x => x.Product)
+                                        .Include(x => x.Origin)
+                                        .Include(x => x.Material)
+                                        .FirstOrDefaultAsync(x => x.ProductId == id);
                 return await Context.Cage
-                    .AsNoTracking()
-                    .Include(x => x.Product)
-                    .Include(x => x.Origin)
-                    .Include(x => x.Material)
-                    .FirstOrDefaultAsync(x => x.ProductId == id);
+                                    .AsNoTracking()
+                                    .Include(x => x.Product)
+                                    .Include(x => x.Origin)
+                                    .Include(x => x.Material)
+                                    .FirstOrDefaultAsync(x => x.ProductId == id);
             }
             catch
             {
@@ -43,15 +49,13 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public async Task<IQueryable<Cage>> ReadAllChild()
+        public async Task<IQueryable<Cage>> ReadAllChild(bool isTracking)
         {
             try
             {
-                return Context.Cage
-                    .AsNoTracking()
-                    .Include(x => x.Product)
-                    .Include(x => x.Origin)
-                    .Include(x => x.Material);
+                return isTracking
+                    ? Context.Cage
+                    : Context.Cage.AsNoTracking();
             }
             catch
             {
@@ -76,7 +80,7 @@ namespace CutieShop.API.Models.DAOs
         {
             try
             {
-                Context.Cage.Remove(await ReadChild(id));
+                Context.Cage.Remove(await ReadChild(id, true));
                 return await Context.SaveChangesAsync() != 0;
             }
             catch

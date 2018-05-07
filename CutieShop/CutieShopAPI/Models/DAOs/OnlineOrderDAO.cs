@@ -26,10 +26,12 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<OnlineOrder> Read(string id)
+        public override async Task<OnlineOrder> Read(string id, bool isTracking)
         {
             try
             {
+                if (isTracking)
+                    return await Context.OnlineOrder.FindAsync(id);
                 return await Context.OnlineOrder.AsNoTracking().FirstOrDefaultAsync(x => x.OnlineOrderId == id);
             }
             catch
@@ -38,11 +40,13 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<IQueryable<OnlineOrder>> ReadAll()
+        public override async Task<IQueryable<OnlineOrder>> ReadAll(bool isTracking)
         {
             try
             {
-                return Context.OnlineOrder.AsNoTracking();
+                return isTracking 
+                    ? Context.OnlineOrder 
+                    : Context.OnlineOrder.AsNoTracking();
             }
             catch
             {
@@ -67,7 +71,7 @@ namespace CutieShop.API.Models.DAOs
         {
             try
             {
-                Context.OnlineOrder.Remove(await Read(id));
+                Context.OnlineOrder.Remove(await Read(id, true));
                 return await Context.SaveChangesAsync() != 0;
             }
             catch

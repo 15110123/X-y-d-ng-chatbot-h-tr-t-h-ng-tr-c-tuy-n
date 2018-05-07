@@ -1,6 +1,6 @@
 ﻿namespace CutieShop.API.Models.Entities
 {
-    public class Toy
+    public partial class Toy
     {
         public string ProductId { get; set; }
         public string Color { get; set; }

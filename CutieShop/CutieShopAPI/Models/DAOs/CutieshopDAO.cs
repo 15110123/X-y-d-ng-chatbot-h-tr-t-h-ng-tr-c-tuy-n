@@ -18,9 +18,9 @@ namespace CutieShop.API.Models.DAOs
 
         public abstract Task<bool> Create(TEntity entity);
 
-        public abstract Task<TEntity> Read(TID id);
+        public abstract Task<TEntity> Read(TID id, bool isTracking);
 
-        public abstract Task<IQueryable<TEntity>> ReadAll();
+        public abstract Task<IQueryable<TEntity>> ReadAll(bool isTracking);
 
         public abstract Task<bool> Update(TEntity entity);
 

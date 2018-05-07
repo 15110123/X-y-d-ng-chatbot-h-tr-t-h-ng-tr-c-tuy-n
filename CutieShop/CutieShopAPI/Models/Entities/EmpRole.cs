@@ -2,7 +2,7 @@
 
 namespace CutieShop.API.Models.Entities
 {
-    public class EmpRole
+    public partial class EmpRole
     {
         public EmpRole()
         {

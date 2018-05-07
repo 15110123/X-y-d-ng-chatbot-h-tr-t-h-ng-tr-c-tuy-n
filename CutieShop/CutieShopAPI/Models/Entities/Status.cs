@@ -2,7 +2,7 @@
 
 namespace CutieShop.API.Models.Entities
 {
-    public class Status
+    public partial class Status
     {
         public Status()
         {

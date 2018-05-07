@@ -26,10 +26,14 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public async Task<Toy> ReadChild(string id)
+        public async Task<Toy> ReadChild(string id, bool isTracking)
         {
             try
             {
+                if (isTracking)
+                    return await Context.Toy
+                        .Include(x => x.Product)
+                        .FirstOrDefaultAsync(x => x.ProductId == id);
                 return await Context.Toy
                     .AsNoTracking()
                     .Include(x => x.Product)
@@ -41,13 +45,13 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public async Task<IQueryable<Toy>> ReadAllChild()
+        public async Task<IQueryable<Toy>> ReadAllChild(bool isTracking)
         {
             try
             {
-                return Context.Toy
-                    .AsNoTracking()
-                    .Include(x => x.Product);
+                return isTracking
+                    ? Context.Toy
+                    : Context.Toy.AsNoTracking();
             }
             catch
             {
@@ -72,7 +76,7 @@ namespace CutieShop.API.Models.DAOs
         {
             try
             {
-                Context.Toy.Remove(await ReadChild(id));
+                Context.Toy.Remove(await ReadChild(id, true));
                 return await Context.SaveChangesAsync() != 0;
             }
             catch

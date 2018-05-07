@@ -1,15 +1,15 @@
-﻿using System;
-using CutieShop.API.Models.DAOs;
+﻿using CutieShop.API.Models.DAOs;
+using CutieShop.API.Models.Entities;
 using CutieShop.API.Models.Exceptions;
+using CutieShop.API.Models.Helpers;
 using CutieShop.API.Models.JSONEntities.FacebookRichMessages;
+using CutieShop.API.Models.JSONEntities.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using CutieShop.API.Models.Entities;
-using CutieShop.API.Models.Helpers;
-using CutieShop.API.Models.JSONEntities.Settings;
-using CutieShop.API.Models.Utils;
+
 #pragma warning disable 4014
 
 // ReSharper disable InconsistentNaming
@@ -19,6 +19,8 @@ namespace CutieShop.API.Models.ChatHandlers
     internal class BuyReqHandler : ChatHandler
     {
         private readonly MailContent _mailContent;
+
+        //There might be data validations for some steps. Remember, by jump into different step, MsgReply and other data should be also different. You may want to skip validation if you want to jump into other step to let it return its' message. 
         private bool _isSkipValidation;
 
         public BuyReqHandler(Controller receiver, dynamic request, MailContent mailContent)
@@ -31,6 +33,7 @@ namespace CutieShop.API.Models.ChatHandlers
         {
             var currentStep = Storage.GetCurrentStep(MsgId);
 
+            //Switch to next step = currentStep + 1
             switch (currentStep + 1)
             {
                 #region step 1
@@ -49,7 +52,7 @@ namespace CutieShop.API.Models.ChatHandlers
                                         type = 2,
                                         platform = "facebook",
                                         title = "Bạn muốn sản phẩm cho thú cưng nào ạ?",
-                                        replies = (await petTypeDAO.ReadAll())
+                                        replies = (await petTypeDAO.ReadAll(false))
                                             .Select(x => x.Name)
                                             .ToArray()
                                     }
@@ -66,7 +69,7 @@ namespace CutieShop.API.Models.ChatHandlers
                         {
                             using (var petTypeDAO = new PetTypeDAO())
                             {
-                                if (await (await petTypeDAO.ReadAll())
+                                if (await (await petTypeDAO.ReadAll(false))
                                     .Select(x => x.Name)
                                     .AllAsync(x => x != MsgReply))
                                 {
@@ -146,7 +149,7 @@ namespace CutieShop.API.Models.ChatHandlers
                         //Find minimum and maximum price from step 3
                         int minimumPrice, maximumPrice;
 
-                        switch (Storage[MsgId][3])
+                        switch (Storage[MsgId, 3])
                         {
                             case "<100000":
                                 minimumPrice = 0;
@@ -167,22 +170,7 @@ namespace CutieShop.API.Models.ChatHandlers
                         }
 
                         //Find product in step 2, for pet in step 1
-                        dynamic dao;
-                        switch (Storage[MsgId][2])
-                        {
-                            case "Đồ chơi":
-                                {
-                                    dao = new ToyDAO();
-                                    break;
-                                }
-                            case "Thức ăn":
-                                {
-
-                                    break;
-                                }
-                        }
-
-                        break;
+                        return await MessengerProductListResult(GetProductType(), minimumPrice, maximumPrice);
                     }
                 #endregion
                 #region Step 5
@@ -193,7 +181,7 @@ namespace CutieShop.API.Models.ChatHandlers
                         {
                             using (var productDAO = new ProductDAO())
                             {
-                                if (await productDAO.Read(MsgQuery) == null)
+                                if (await productDAO.Read(MsgQuery, false) == null)
                                 {
                                     _isSkipValidation = true;
                                     goto case 4;
@@ -205,7 +193,7 @@ namespace CutieShop.API.Models.ChatHandlers
                         Storage.AddOrUpdateToStorage(MsgId, 4, MsgQuery);
                         return Receiver.Json(new
                         {
-                            speech = "Bạn có thể cho mình biết tên đăng nhập trên hệ thống Cutieshop được không ạ?\nNếu không có, bạn có thể gõ tên đăng nhập mới để chúng mình tạo tài khoản cho bạn"
+                            speech = "Bạn có thể cho mình biết tên đăng nhập trên hệ thống Cutieshop được không ạ?\nNếu chưa có, bạn có thể gõ tên đăng nhập mới để chúng mình tạo tài khoản cho bạn"
                         });
                     }
                 #endregion
@@ -213,15 +201,69 @@ namespace CutieShop.API.Models.ChatHandlers
 
                 case 6:
                     {
-                        Storage.AddOrUpdateToStorage(MsgId, 6, null);
-                        Storage.AddOrUpdateToStorage(MsgId, 5, MsgReply);
+                        //This step receive username first, then the email and address. So we need to keep the username to the storage for further uses, email will be used once in this step and can be queried by DAO easily in the future. 
+                        //Checking null will prevent email from being overwritten to username in Storage
+                        if (Storage[MsgId, 5] == null)
+                        {
+                            Storage.AddOrUpdateToStorage(MsgId, 5, MsgReply);
+                        }
+
                         using (var userDAO = new UserDAO())
                         {
-                            var user = await userDAO.ReadChild(Storage[MsgId][5]);
+                            var user = await userDAO.ReadChild(Storage[MsgId, 5], true);
+                            //If user is null, create a user, then ask customer their email
                             if (user == null)
                             {
-                                throw new UnhandledChatException();
+                                await userDAO.Create(new Auth
+                                {
+                                    Username = Storage[MsgId, 5],
+                                    Password = new GuidHelper().CreateGuid()
+                                });
+                                await userDAO.CreateChild(new User
+                                {
+                                    Username = Storage[MsgId, 5],
+                                    Email = string.Empty,
+                                    Address = string.Empty
+                                });
+
+                                await userDAO.Context.SaveChangesAsync();
                             }
+
+                            user = await userDAO.ReadChild(Storage[MsgId, 5], true);
+                            //If email is empty, as for email 
+                            if (user.Email == string.Empty)
+                            {
+                                if (Storage[MsgId, 6, "isAskForEmail"] == null)
+                                {
+                                    Storage.AddOrUpdateToStorage(MsgId, 6, "isAskForEmail", "1");
+                                    return Receiver.Json(new
+                                    {
+                                        speech = "Bạn hãy cho mình biết email nhé"
+                                    });
+                                }
+
+                                user.Email = MsgReply;
+                                await userDAO.Context.SaveChangesAsync();
+                            }
+
+                            //If address is empty but email is not, MsgReply must be address
+                            if (user.Address == string.Empty)
+                            {
+                                if (Storage[MsgId, 6, "isAskForAddress"] == null)
+                                {
+                                    Storage.AddOrUpdateToStorage(MsgId, 6, "isAskForAddress", "1");
+                                    return Receiver.Json(new
+                                    {
+                                        speech = "Bạn cho mình xin địa chỉ"
+                                    });
+                                }
+
+                                user.Address = MsgReply;
+                                await userDAO.Context.SaveChangesAsync();
+                            }
+
+                            //Ready to jump into step 7 after this
+                            Storage.AddOrUpdateToStorage(MsgId, 6, null);
 
                             using (var onlineOrderProductDAO = new OnlineOrderProductDAO(userDAO.Context))
                             {
@@ -242,11 +284,29 @@ namespace CutieShop.API.Models.ChatHandlers
                                 });
                                 await onlineOrderProductDAO.CreateChild(new OnlineOrderProduct
                                 {
-                                    ProductId = Storage[MsgId][4],
-                                    OnlineOrderId = orderId
+                                    ProductId = Storage[MsgId, 4],
+                                    OnlineOrderId = orderId,
+                                    Quantity = 1
                                 });
-                                MailUtils.Send(user.Email, _mailContent.BuyReq.Subject, _mailContent.BuyReq.Body);
 
+                                Product buyProduct;
+                                using (var productDAO = new ProductDAO())
+                                {
+                                    buyProduct = await productDAO.Read(Storage[MsgId, 4], false);
+                                }
+                                var mailProductTable = _mailContent.BuyReq.TableRow.
+                                    Replace("{0}", buyProduct.Name)
+                                    .Replace("{1}", buyProduct.Description)
+                                    .Replace("{2}", "1");
+
+                                var mailBody = _mailContent.BuyReq.Body
+                                    .Replace("{0}", user.Username)
+                                    .Replace("{1}", mailProductTable)
+                                    .Replace("{2}", "http://cutieshopapi.azurewebsites.net/verify?id=" + orderId);
+
+                                //MailUtils.Send(user.Email, _mailContent.BuyReq.Subject, mailBody);
+
+                                //Remove data in storage
                                 Storage.RemoveId(MsgId);
 
                                 return Receiver.Json(new
@@ -263,6 +323,154 @@ namespace CutieShop.API.Models.ChatHandlers
 
             Storage.RemoveId(MsgId);
             throw new UnhandledChatException();
+        }
+
+        private async Task<IActionResult> MessengerProductListResult(Type childType, int minPrice, int maxPrice)
+        {
+            MessCard[] messages;
+            if (childType == typeof(Toy))
+            {
+                messages = (await new ToyDAO().ReadAllChild(false))
+                    .Include(x => x.Product)
+                    .Include(x => x.Product.ProductForPetType)
+                    .Where(x => x.Product.Price >= minPrice
+                                && x.Product.Price <= maxPrice
+                                && x.Product.ProductForPetType.Any(y => y.PetType.Name == Storage[MsgId, 1, ""]))
+                    .Select(x => new MessCard
+                    {
+                        type = 1,
+                        platform = "facebook",
+                        title = x.Product.Name,
+                        subtitle = x.Product.Price.ToString(),
+                        imageUrl = x.Product.ImgUrl,
+                        buttons = new[]
+                        {
+                            new Button
+                            {
+                                text = "Đặt liền",
+                                postback = x.ProductId
+                            }
+                        }
+                    }).ToArray();
+            }
+            else if (childType == typeof(Food))
+            {
+                messages = (await new FoodDAO().ReadAllChild(false))
+                    .Include(x => x.Product)
+                    .Include(x => x.Product.ProductForPetType)
+                    .Where(x => x.Product.Price >= minPrice
+                                && x.Product.Price <= maxPrice
+                                && x.Product.ProductForPetType.Any(y => y.PetType.Name == Storage[MsgId, 1, ""]))
+                    .Select(x => new MessCard
+                    {
+                        type = 1,
+                        platform = "facebook",
+                        title = x.Product.Name,
+                        subtitle = x.Product.Price.ToString(),
+                        imageUrl = x.Product.ImgUrl,
+                        buttons = new[]
+                        {
+                            new Button
+                            {
+                                text = "Đặt liền",
+                                postback = x.ProductId
+                            }
+                        }
+                    }).ToArray();
+            }
+            else if (childType == typeof(Cage))
+            {
+                messages = (await new CageDAO().ReadAllChild(false))
+                    .Include(x => x.Product)
+                    .Include(x => x.Product.ProductForPetType)
+                    .Where(x => x.Product.Price >= minPrice
+                                && x.Product.Price <= maxPrice
+                                && x.Product.ProductForPetType.Any(y => y.PetType.Name == Storage[MsgId, 1, ""]))
+                    .Select(x => new MessCard
+                    {
+                        type = 1,
+                        platform = "facebook",
+                        title = x.Product.Name,
+                        subtitle = x.Product.Price.ToString(),
+                        imageUrl = x.Product.ImgUrl,
+                        buttons = new[]
+                        {
+                            new Button
+                            {
+                                text = "Đặt liền",
+                                postback = x.ProductId
+                            }
+                        }
+                    }).ToArray();
+            }
+            else
+            {
+                messages = (await new AccessoryDAO().ReadAllChild(false))
+                    .Include(x => x.Product)
+                    .Include(x => x.Product.ProductForPetType)
+                    .Where(x => x.Product.Price >= minPrice
+                                && x.Product.Price <= maxPrice
+                                && x.Product.ProductForPetType.Any(y => y.PetType.Name == Storage[MsgId, 1, ""]))
+                    .Select(x => new MessCard
+                    {
+                        type = 1,
+                        platform = "facebook",
+                        title = x.Product.Name,
+                        subtitle = x.Product.Price.ToString(),
+                        imageUrl = x.Product.ImgUrl,
+                        buttons = new[]
+                        {
+                            new Button
+                            {
+                                text = "Đặt liền",
+                                postback = x.ProductId
+                            }
+                        }
+                    }).ToArray();
+            }
+
+            //Return message
+            if (messages.Any())
+                return Receiver.Json(new
+                {
+                    speech = "",
+                    messages
+                });
+
+            //Delete data when no products found
+            Storage.RemoveId(MsgId);
+            return Receiver.Json(new
+            {
+                speech = "Xin lỗi bạn. Chúng mình tạm thời không còn bán loại hàng này."
+            });
+
+        }
+
+        private Type GetProductType()
+        {
+            switch (Storage[MsgId, 2])
+            {
+                case "Đồ chơi":
+                    {
+                        return typeof(Toy);
+                    }
+                case "Thức ăn":
+                    {
+                        return typeof(Food);
+                    }
+                case "Lồng":
+                    {
+                        return typeof(Cage);
+                    }
+                case "phụ kiện":
+                    {
+                        return typeof(Accessory);
+                    }
+                default:
+                    {
+                        throw new UnhandledChatException();
+                    }
+            }
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CutieShop.API.Models.Entities
 {
-    public class OnlineOrder
+    public partial class OnlineOrder
     {
         public OnlineOrder()
         {

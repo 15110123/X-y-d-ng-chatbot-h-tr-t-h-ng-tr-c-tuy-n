@@ -2,7 +2,7 @@
 
 namespace CutieShop.API.Models.Entities
 {
-    public class Auth
+    public partial class Auth
     {
         public Auth()
         {

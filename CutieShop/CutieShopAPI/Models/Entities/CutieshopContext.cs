@@ -2,7 +2,7 @@
 
 namespace CutieShop.API.Models.Entities
 {
-    public class CutieshopContext : DbContext
+    public partial class CutieshopContext : DbContext
     {
         public virtual DbSet<Accessory> Accessory { get; set; }
         public virtual DbSet<Auth> Auth { get; set; }
@@ -663,7 +663,9 @@ namespace CutieShop.API.Models.Entities
                     .IsUnicode(false)
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.Email).IsUnicode(false);
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .IsUnicode(false);
 
                 entity.Property(e => e.FacebookId)
                     .HasColumnName("FacebookID")

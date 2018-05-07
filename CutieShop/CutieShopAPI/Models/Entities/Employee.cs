@@ -1,6 +1,6 @@
 ﻿namespace CutieShop.API.Models.Entities
 {
-    public class Employee
+    public partial class Employee
     {
         public string Username { get; set; }
         public string RoleId { get; set; }

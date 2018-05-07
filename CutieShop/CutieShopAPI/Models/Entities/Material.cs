@@ -2,7 +2,7 @@
 
 namespace CutieShop.API.Models.Entities
 {
-    public class Material
+    public partial class Material
     {
         public Material()
         {

@@ -2,7 +2,7 @@
 
 namespace CutieShop.API.Models.Entities
 {
-    public class Invoice
+    public partial class Invoice
     {
         public Invoice()
         {

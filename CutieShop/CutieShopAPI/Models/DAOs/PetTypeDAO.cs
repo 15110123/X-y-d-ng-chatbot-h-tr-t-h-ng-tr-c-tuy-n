@@ -30,7 +30,7 @@ namespace CutieShop.API.Models.DAOs
         {
             try
             {
-                Context.PetType.Remove(await Read(id));
+                Context.PetType.Remove(await Read(id, true));
                 return await Context.SaveChangesAsync() != 0;
             }
             catch
@@ -39,11 +39,12 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<PetType> Read(string id)
+        public override async Task<PetType> Read(string id, bool isTracking)
         {
             try
             {
-                return await Context.PetType.FindAsync(id);
+                if (isTracking) return await Context.PetType.FindAsync(id);
+                return await Context.PetType.AsNoTracking().FirstOrDefaultAsync(x => x.PetTypeId == id);
             }
             catch
             {
@@ -51,11 +52,13 @@ namespace CutieShop.API.Models.DAOs
             }
         }
 
-        public override async Task<IQueryable<PetType>> ReadAll()
+        public override async Task<IQueryable<PetType>> ReadAll(bool isTracking)
         {
             try
             {
-                return Context.PetType.AsNoTracking();
+                return isTracking 
+                    ? Context.PetType 
+                    : Context.PetType.AsNoTracking();
             }
             catch
             {

@@ -2,7 +2,7 @@
 
 namespace CutieShop.API.Models.Entities
 {
-    public class Origin
+    public partial class Origin
     {
         public Origin()
         {

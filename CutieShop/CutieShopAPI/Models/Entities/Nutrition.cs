@@ -2,7 +2,7 @@
 
 namespace CutieShop.API.Models.Entities
 {
-    public class Nutrition
+    public partial class Nutrition
     {
         public Nutrition()
         {

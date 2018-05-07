@@ -1,6 +1,6 @@
 ﻿namespace CutieShop.API.Models.Entities
 {
-    public class UserPointHistory
+    public partial class UserPointHistory
     {
         public string Username { get; set; }
         public int? ChangedValue { get; set; }

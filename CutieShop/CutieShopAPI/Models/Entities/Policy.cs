@@ -1,6 +1,6 @@
 ﻿namespace CutieShop.API.Models.Entities
 {
-    public class Policy
+    public partial class Policy
     {
         public string Name { get; set; }
         public int? MinimumValue { get; set; }

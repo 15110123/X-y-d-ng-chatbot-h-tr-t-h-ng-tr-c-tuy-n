@@ -2,7 +2,7 @@
 
 namespace CutieShop.API.Models.Entities
 {
-    public class Size
+    public partial class Size
     {
         public Size()
         {

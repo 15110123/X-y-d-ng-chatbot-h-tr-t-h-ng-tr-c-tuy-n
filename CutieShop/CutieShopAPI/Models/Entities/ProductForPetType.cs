@@ -1,6 +1,6 @@
 ﻿namespace CutieShop.API.Models.Entities
 {
-    public class ProductForPetType
+    public partial class ProductForPetType
     {
         public string ProductId { get; set; }
         public string PetTypeId { get; set; }

@@ -2,7 +2,7 @@
 
 namespace CutieShop.API.Models.Entities
 {
-    public class PetType
+    public partial class PetType
     {
         public PetType()
         {

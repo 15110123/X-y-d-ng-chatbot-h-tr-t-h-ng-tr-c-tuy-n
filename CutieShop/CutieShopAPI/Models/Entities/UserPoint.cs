@@ -1,6 +1,6 @@
 ﻿namespace CutieShop.API.Models.Entities
 {
-    public class UserPoint
+    public partial class UserPoint
     {
         public string Username { get; set; }
         public int? Value { get; set; }
