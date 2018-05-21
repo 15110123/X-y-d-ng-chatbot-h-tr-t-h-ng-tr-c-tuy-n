@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\components\Dashboard_nv\WarningBanner.tsx" />
     <None Remove="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Remove="Properties\PublishProfiles\CutieShopWeb - Web Deploy.pubxml" />
   </ItemGroup>
@@ -49,6 +50,10 @@
     <None Include="wwwroot\webfonts\fa-regular-400.woff2" />
     <None Include="wwwroot\webfonts\fa-solid-900.svg" />
     <None Include="wwwroot\webfonts\fa-solid-900.woff2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\components\Dashboard_nv\WarningBanner.tsx" />
   </ItemGroup>
 
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">
