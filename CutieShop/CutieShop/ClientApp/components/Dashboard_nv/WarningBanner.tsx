@@ -15,7 +15,7 @@ export class WarningBanner extends React.Component<{ warn: boolean }, {}> {
 
         else {
             return (
-                <div className="warning">
+                <div className="warningBanner warning">
                     <h2>Bạn không có quyền truy cập vào khu vực này!</h2>
                 </div>
             );

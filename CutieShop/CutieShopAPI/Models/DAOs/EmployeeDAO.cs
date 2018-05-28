@@ -44,7 +44,7 @@ namespace CutieShop.API.Models.DAOs
         {
             try
             {
-                return isTracking ? Context.Employee : Context.Employee.AsTracking();
+                return isTracking ? Context.Employee : Context.Employee.AsNoTracking();
             }
             catch
             {

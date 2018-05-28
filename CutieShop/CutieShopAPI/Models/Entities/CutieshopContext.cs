@@ -1,9 +1,20 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace CutieShop.API.Models.Entities
+namespace CutieShop
 {
     public partial class CutieshopContext : DbContext
     {
+        public CutieshopContext()
+        {
+        }
+
+        public CutieshopContext(DbContextOptions<CutieshopContext> options)
+            : base(options)
+        {
+        }
+
         public virtual DbSet<Accessory> Accessory { get; set; }
         public virtual DbSet<Auth> Auth { get; set; }
         public virtual DbSet<Cage> Cage { get; set; }
@@ -12,7 +23,9 @@ namespace CutieShop.API.Models.Entities
         public virtual DbSet<Food> Food { get; set; }
         public virtual DbSet<Invoice> Invoice { get; set; }
         public virtual DbSet<InvoiceDetails> InvoiceDetails { get; set; }
+        public virtual DbSet<JoinXx> JoinXx { get; set; }
         public virtual DbSet<Material> Material { get; set; }
+        public virtual DbSet<NhapTrongKy> NhapTrongKy { get; set; }
         public virtual DbSet<Nutrition> Nutrition { get; set; }
         public virtual DbSet<OnlineOrder> OnlineOrder { get; set; }
         public virtual DbSet<OnlineOrderProduct> OnlineOrderProduct { get; set; }
@@ -22,23 +35,28 @@ namespace CutieShop.API.Models.Entities
         public virtual DbSet<Policy> Policy { get; set; }
         public virtual DbSet<Product> Product { get; set; }
         public virtual DbSet<ProductForPetType> ProductForPetType { get; set; }
+        public virtual DbSet<Report> Report { get; set; }
+        public virtual DbSet<ReportDetails> ReportDetails { get; set; }
         public virtual DbSet<Service> Service { get; set; }
         public virtual DbSet<ServiceOnlineOrder> ServiceOnlineOrder { get; set; }
         public virtual DbSet<Session> Session { get; set; }
         public virtual DbSet<Size> Size { get; set; }
         public virtual DbSet<Status> Status { get; set; }
+        public virtual DbSet<TonCuoiKy> TonCuoiKy { get; set; }
+        public virtual DbSet<TonDauKy> TonDauKy { get; set; }
         public virtual DbSet<Toy> Toy { get; set; }
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<UserPoint> UserPoint { get; set; }
         public virtual DbSet<UserPointHistory> UserPointHistory { get; set; }
         public virtual DbSet<Vendor> Vendor { get; set; }
+        public virtual DbSet<XuatTrongKy> XuatTrongKy { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer(@"Data Source=cutieshop.database.windows.net;Initial Catalog=CutieShop;User ID=shopadmin;Password=Spkt2015");
+                optionsBuilder.UseSqlServer("Data Source=cutieshop.database.windows.net;Initial Catalog=CutieShop;Persist Security Info=True;User ID=shopadmin;Password=Spkt2015");
             }
         }
 
@@ -277,6 +295,76 @@ namespace CutieShop.API.Models.Entities
                     .HasConstraintName("FK_InvoiceDetails_Invoice");
             });
 
+            modelBuilder.Entity<JoinXx>(entity =>
+            {
+                entity.HasKey(e => e.IdJoin);
+
+                entity.ToTable("JoinXX");
+
+                entity.Property(e => e.IdJoin)
+                    .HasColumnName("ID_Join")
+                    .HasMaxLength(36)
+                    .IsUnicode(false)
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.IdNtk)
+                    .HasColumnName("ID_NTK")
+                    .HasMaxLength(36)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IdReport)
+                    .HasColumnName("ID_Report")
+                    .HasMaxLength(36)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IdTck)
+                    .HasColumnName("ID_TCK")
+                    .HasMaxLength(36)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IdTdk)
+                    .HasColumnName("ID_TDK")
+                    .HasMaxLength(36)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IdXtk)
+                    .HasColumnName("ID_XTK")
+                    .HasMaxLength(36)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.IdJoinNavigation)
+                    .WithOne(p => p.JoinXx)
+                    .HasPrincipalKey<ReportDetails>(p => p.IdJoin)
+                    .HasForeignKey<JoinXx>(d => d.IdJoin)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("JoinXX_Report_Details_ID_Join_fk");
+
+                entity.HasOne(d => d.IdNtkNavigation)
+                    .WithMany(p => p.JoinXx)
+                    .HasForeignKey(d => d.IdNtk)
+                    .HasConstraintName("FK_JoinXX_NhapTrongKy");
+
+                entity.HasOne(d => d.IdReportNavigation)
+                    .WithMany(p => p.JoinXx)
+                    .HasForeignKey(d => d.IdReport)
+                    .HasConstraintName("FK_JoinXX_Report");
+
+                entity.HasOne(d => d.IdTckNavigation)
+                    .WithMany(p => p.JoinXx)
+                    .HasForeignKey(d => d.IdTck)
+                    .HasConstraintName("FK_JoinXX_TonCuoiKy");
+
+                entity.HasOne(d => d.IdTdkNavigation)
+                    .WithMany(p => p.JoinXx)
+                    .HasForeignKey(d => d.IdTdk)
+                    .HasConstraintName("FK_JoinXX_TonDauKy");
+
+                entity.HasOne(d => d.IdXtkNavigation)
+                    .WithMany(p => p.JoinXx)
+                    .HasForeignKey(d => d.IdXtk)
+                    .HasConstraintName("FK_JoinXX_XuatTrongKy");
+            });
+
             modelBuilder.Entity<Material>(entity =>
             {
                 entity.Property(e => e.MaterialId)
@@ -289,6 +377,19 @@ namespace CutieShop.API.Models.Entities
                     .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<NhapTrongKy>(entity =>
+            {
+                entity.HasKey(e => e.IdNtk);
+
+                entity.Property(e => e.IdNtk)
+                    .HasColumnName("ID_NTK")
+                    .HasMaxLength(36)
+                    .IsUnicode(false)
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.QuantityNtk).HasColumnName("Quantity_NTK");
             });
 
             modelBuilder.Entity<Nutrition>(entity =>
@@ -524,6 +625,55 @@ namespace CutieShop.API.Models.Entities
                     .HasConstraintName("FK_ProductForPetType_Product");
             });
 
+            modelBuilder.Entity<Report>(entity =>
+            {
+                entity.HasKey(e => e.IdReport);
+
+                entity.Property(e => e.IdReport)
+                    .HasColumnName("ID_Report")
+                    .HasMaxLength(36)
+                    .IsUnicode(false)
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.DateElWarehouse)
+                    .HasColumnName("Date_El_warehouse")
+                    .HasColumnType("date");
+            });
+
+            modelBuilder.Entity<ReportDetails>(entity =>
+            {
+                entity.ToTable("Report_Details");
+
+                entity.HasIndex(e => e.IdJoin)
+                    .HasName("Report_Details_ID_Join_uindex")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.IdProduct)
+                    .HasName("Report_Details_ID_Product_pk_2")
+                    .IsUnique();
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.IdJoin)
+                    .IsRequired()
+                    .HasColumnName("ID_Join")
+                    .HasMaxLength(36)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IdProduct)
+                    .HasColumnName("ID_Product")
+                    .HasMaxLength(36)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ProductName)
+                    .HasColumnName("Product_Name")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Unit).HasMaxLength(50);
+            });
+
             modelBuilder.Entity<Service>(entity =>
             {
                 entity.HasKey(e => e.ProductId);
@@ -606,6 +756,32 @@ namespace CutieShop.API.Models.Entities
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<TonCuoiKy>(entity =>
+            {
+                entity.HasKey(e => e.IdTck);
+
+                entity.Property(e => e.IdTck)
+                    .HasColumnName("ID_TCK")
+                    .HasMaxLength(36)
+                    .IsUnicode(false)
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.QuantityTck).HasColumnName("Quantity_TCK");
+            });
+
+            modelBuilder.Entity<TonDauKy>(entity =>
+            {
+                entity.HasKey(e => e.IdTdk);
+
+                entity.Property(e => e.IdTdk)
+                    .HasColumnName("ID_TDK")
+                    .HasMaxLength(36)
+                    .IsUnicode(false)
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.QuantityTdk).HasColumnName("Quantity_TDK");
             });
 
             modelBuilder.Entity<Toy>(entity =>
@@ -726,6 +902,23 @@ namespace CutieShop.API.Models.Entities
                     .IsRequired()
                     .HasMaxLength(100);
             });
+
+            modelBuilder.Entity<XuatTrongKy>(entity =>
+            {
+                entity.HasKey(e => e.IdXtk);
+
+                entity.Property(e => e.IdXtk)
+                    .HasColumnName("ID_XTK")
+                    .HasMaxLength(36)
+                    .IsUnicode(false)
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.QuantityXtk).HasColumnName("Quantity_XTK");
+            });
+
+            OnModelCreatingPartial(modelBuilder);
         }
+
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }

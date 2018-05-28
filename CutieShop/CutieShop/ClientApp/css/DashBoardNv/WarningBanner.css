@@ -1,14 +1,14 @@
-﻿* {
+﻿.warningBanner * {
     font-family: sans-serif;
     margin: 0;
 }
 
-button {
+.warningBanner button {
     height: 40px;
     width: 200px;
 }
 
-.warning {
+.warningBanner.warning {
     background-color: red;
     text-align: center;
     width: 100%;

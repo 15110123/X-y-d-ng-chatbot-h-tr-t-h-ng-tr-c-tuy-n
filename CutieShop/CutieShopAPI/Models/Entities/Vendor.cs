@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
-namespace CutieShop.API.Models.Entities
+namespace CutieShop
 {
     public partial class Vendor
     {

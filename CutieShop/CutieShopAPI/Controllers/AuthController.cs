@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using CutieShop.API.Models.DAOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using CutieShop.API.Models.Entities;
 
 namespace CutieShop.API.Controllers
 {
@@ -14,46 +16,43 @@ namespace CutieShop.API.Controllers
         {
             using (var userDAO = new UserDAO())
             {
-                var result = await userDAO.Context.Auth.FirstOrDefaultAsync(x => x.Username == username && x.Password == password);
-                if (result == null)
-                {
-                    using (var employeeDAO = new em)
-                    return Json(null);
-                }
-                var sessionId = await userDAO.CreateSession(result.Username);
-
                 dynamic jsonObj = new ExpandoObject();
 
-                jsonObj.sessionId = sessionId;
-                jsonObj.name = result.Name;
-                jsonObj.profileImg = result.ProfileImg;
+                var resultUser = await userDAO.Context.User
+                    .Include(x => x.UsernameNavigation)
+                    .Include(x => x.UserPoint)
+                    .FirstOrDefaultAsync(x => x.Username == username && x.UsernameNavigation.Password == password);
 
-                if (result.Employee != null)
+                if (resultUser == null)
                 {
-                    jsonObj.customer = null;
-                    jsonObj.employee = new
+                    using (var employeeDAO = new EmployeeDAO())
                     {
-                        address = result.Employee.Address,
-                        dateOfBirth = result.Employee.DateOfBirth,
-                        homeTown = result.Employee.HomeTown,
-                        phoneNumber = result.Employee.PhoneNumber,
-                        email = result.Employee.Email,
-                        type = result.Employee.Type,
-                        store = result.Employee.Store
-                    };
+                        var resultEmp = await employeeDAO.Context.Employee
+                            .Include(x => x.UsernameNavigation)
+                            .FirstOrDefaultAsync(x => x.Username == username && x.UsernameNavigation.Password == password);
+                        jsonObj.sessionId = await employeeDAO.CreateSession(resultEmp.Username);
+                        jsonObj.employee = new
+                        {
+                            roleId = resultEmp.RoleId,
+                            email = resultEmp.Email
+                        };
+                    }
                 }
                 else
                 {
-                    jsonObj.customer = new
+                    jsonObj.sessionId = await userDAO.CreateSession(resultUser.Username);
+                    jsonObj.user = new
                     {
-                        address = result.Customer.Address,
-                        phoneNumber = result.Customer.PhoneNumber,
-                        email = result.Customer.Email,
-                        point = result.Customer.Point.Value
+                        firstName = resultUser.FirstName,
+                        lastName = resultUser.LastName,
+                        birthDate = resultUser.BirthDate,
+                        address = resultUser.Address,
+                        district = resultUser.District,
+                        city = resultUser.City,
+                        email = resultUser.Email,
+                        point = resultUser.UserPoint.Value
                     };
-                    jsonObj.employee = null;
                 }
-
                 return Json(jsonObj);
             }
         }
@@ -62,45 +61,46 @@ namespace CutieShop.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Session(string sessionId)
         {
-            using (var authDAO = new AuthDAO())
+            using (var sessionDAO = new SessionDAO())
             {
-                var result = await authDAO.ReadFromSession(sessionId);
+                var result = await sessionDAO.Context.Session
+                    .Include(x => x.UsernameNavigation)
+                    .FirstOrDefaultAsync(x => x.SessionId == sessionId);
                 if (result == null) return Json(null);
 
-                dynamic jsonObj = new ExpandoObject();
-
-                jsonObj.sessionId = sessionId;
-                jsonObj.name = result.Name;
-                jsonObj.profileImg = result.ProfileImg;
-
-                if (result.Employee != null)
-                {
-                    jsonObj.customer = null;
-                    jsonObj.employee = new
-                    {
-                        address = result.Employee.Address,
-                        dateOfBirth = result.Employee.DateOfBirth,
-                        homeTown = result.Employee.HomeTown,
-                        phoneNumber = result.Employee.PhoneNumber,
-                        email = result.Employee.Email,
-                        type = result.Employee.Type,
-                        store = result.Employee.Store
-                    };
-                }
-                else
-                {
-                    jsonObj.customer = new
-                    {
-                        address = result.Customer.Address,
-                        phoneNumber = result.Customer.PhoneNumber,
-                        email = result.Customer.Email,
-                        point = result.Customer.Point.Value
-                    };
-                    jsonObj.employee = null;
-                }
-
-                return Json(jsonObj);
+                return await Index(result.UsernameNavigation.Username, result.UsernameNavigation.Password);
             }
+        }
+
+        [Route("Signup")]
+        [HttpPost]
+        public async Task<IActionResult> SignUp(string username, string password, string firstName, string lastName, DateTime? birthDate, string address, string district, string city, string email)
+        {
+            using (var userDAO = new UserDAO())
+            {
+                //Create auth
+                await userDAO.Create(new Auth
+                {
+                    Username = username,
+                    Password = password
+                });
+
+                //Create user
+                await userDAO.CreateChild(new User
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    BirthDate = birthDate,
+                    Address = address,
+                    District = district,
+                    City = city,
+                    Email = email
+                });
+            }
+            return Json(new
+            {
+                success = true
+            });
         }
     }
 }

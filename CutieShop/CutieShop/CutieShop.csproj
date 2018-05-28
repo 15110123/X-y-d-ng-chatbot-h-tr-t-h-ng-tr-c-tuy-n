@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
     <PackageReference Include="RestSharp" Version="106.3.0-alpha0002" />
+    <PackageReference Include="Select.HtmlToPdf.NetCore" Version="18.2.0-rc1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +28,10 @@
 
   <ItemGroup>
     <None Remove="ClientApp\components\Dashboard_nv\ContentDashboard.tsx" />
+    <None Remove="ClientApp\components\Dashboard_nv\ExportReports.tsx" />
+    <None Remove="ClientApp\components\Dashboard_nv\MainPageTrackOrder.tsx" />
+    <None Remove="ClientApp\components\Dashboard_nv\StatusBar.tsx" />
+    <None Remove="ClientApp\components\Dashboard_nv\TrackOrderStatus.tsx" />
     <None Remove="ClientApp\components\Dashboard_nv\WarningBanner.tsx" />
     <None Remove="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Remove="Properties\PublishProfiles\CutieShopWeb - Web Deploy.pubxml" />
@@ -55,6 +60,10 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="ClientApp\components\Dashboard_nv\ContentDashboard.tsx" />
+    <TypeScriptCompile Include="ClientApp\components\Dashboard_nv\ExportReports.tsx" />
+    <TypeScriptCompile Include="ClientApp\components\Dashboard_nv\MainPageTrackOrder.tsx" />
+    <TypeScriptCompile Include="ClientApp\components\Dashboard_nv\StatusBar.tsx" />
+    <TypeScriptCompile Include="ClientApp\components\Dashboard_nv\TrackOrderStatus.tsx" />
     <TypeScriptCompile Include="ClientApp\components\Dashboard_nv\WarningBanner.tsx" />
   </ItemGroup>
 
