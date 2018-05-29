@@ -11,10 +11,10 @@ namespace CutieShop.API.Models.Utils
             var mail = new MailMessage();
             var client = new SmtpClient("mail.smtp2go.com", 2525) //Port 8025, 587 and 25 can also be used.
             {
-                Credentials = new NetworkCredential("Vivu Travel", "vnhcmute"),
+                Credentials = new NetworkCredential("hcmute", "spkt2015"),
                 EnableSsl = true
             };
-            mail.From = new MailAddress("vivu_travel@smtpservice.net");
+            mail.From = new MailAddress("cutieshop@smtpservice.net");
             mail.To.Add(email);
             mail.Subject = subject;
             var htmlView = AlternateView.CreateAlternateViewFromString(body, null, "text/html");
