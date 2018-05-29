@@ -15,7 +15,10 @@ export class MainPageTrackOrder extends React.Component<{}, { isShowStatusBar: B
         this.renderTr = this.renderTr.bind(this);
         this.renderTable = this.renderTable.bind(this);
 
-        this.state = {isShowStatusBar: false, value: "Đang tiếp nhận đơn hàng", tableShow: 0, onlineOrderArr: RequestUtils.sendRequest("/api/onlineorder/all", [], "GET")};
+        RequestUtils.sendRequest("/api/onlineorder/all", [], "GET", (o) => {
+            this.state = {isShowStatusBar: false, value: "Đang tiếp nhận đơn hàng", tableShow: 0, onlineOrderArr: o};
+        });
+
         // this.state = {isShowStatusBar: false, value: "Đang tiếp nhận đơn hàng", tableShow: 0, onlineOrderArr: [
         //     {onlineOrderId: 123, date: "1/4/2016", totalPrice: 30000}
         // ]};

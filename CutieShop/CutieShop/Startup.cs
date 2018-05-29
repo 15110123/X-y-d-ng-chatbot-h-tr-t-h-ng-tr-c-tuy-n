@@ -49,8 +49,8 @@ namespace CutieShop
             else
             {
                 //Redirect all HTTP request to HTTPS: https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl
-                var options = new RewriteOptions().AddRedirectToHttps();
-                app.UseRewriter(options);
+                //var options = new RewriteOptions().AddRedirectToHttps();
+               // app.UseRewriter(options);
 
                 app.UseExceptionHandler("/Home/Error");
             }

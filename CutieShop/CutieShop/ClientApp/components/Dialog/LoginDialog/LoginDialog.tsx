@@ -8,6 +8,7 @@ import Checkbox from "material-ui/Checkbox"
 import * as $ from "jquery"
 import Snackbar from "material-ui/Snackbar";
 import Cookies from "js-cookie";
+import RequestUtils from "../../../models/utils/RequestUtils";
 
 export class LoginDialog extends React.Component<{ loginSuccessHandler?: Function, open: boolean }, { isOpen: boolean, isSaveLoginCheck: boolean, isSuccess: boolean | null }> {
     actions;
@@ -92,27 +93,8 @@ export class LoginDialog extends React.Component<{ loginSuccessHandler?: Functio
     loginClickHandler() {
         //Add "checking auth" codes here 
 
-        const form = new FormData();
-        form.append("username", this.username);
-        form.append("password", this.password);
-
-        const settings = {
-            "async": false,
-            "crossDomain": true,
-            "url": window.dbAPI + "/api/auth",
-            "method": "POST",
-            "headers": {
-                "Cache-Control": "no-cache"
-            },
-            "processData": false,
-            "contentType": false,
-            "mimeType": "multipart/form-data",
-            "data": form
-        };
-
-        const res = JSON.parse($.ajax(settings).responseText);
-
-        //Fail login
+    RequestUtils.sendRequest("/api/auth", [["username", this.username], ["password", this.password]], "POST", o => {
+        let res = o;
         if (res == null) {
             this.setState({ isSuccess: false });
             return;
@@ -152,5 +134,27 @@ export class LoginDialog extends React.Component<{ loginSuccessHandler?: Functio
         window.user = res;
         if (this.props.loginSuccessHandler == null) return;
         this.props.loginSuccessHandler();
+    });
+        //const form = new FormData();
+        //form.append("username", this.username);
+        //form.append("password", this.password);
+
+        //const settings = {
+        //    "async": false,
+        //    "crossDomain": true,
+        //    "url": window.dbAPI + "/api/auth",
+        //    "method": "POST",
+        //    "headers": {
+        //        "Cache-Control": "no-cache"
+        //    },
+        //    "processData": false,
+        //    "contentType": false,
+        //    "mimeType": "multipart/form-data",
+        //    "data": form
+        //};
+
+        //const res = JSON.parse($.ajax(settings).responseText);
+
+        //Fail login
     }
 }

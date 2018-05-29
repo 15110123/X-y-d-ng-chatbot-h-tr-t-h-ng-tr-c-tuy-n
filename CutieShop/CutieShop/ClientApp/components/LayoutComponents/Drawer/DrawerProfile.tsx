@@ -13,8 +13,8 @@ export class DrawerProfile extends React.Component<{imgUrl : string}, {}> {
         return <div id="drawerProfile">
             <img id="profileImg" src={this.props.imgUrl} alt="Profile image"/>
                    <span id="profileInfo">
-                       <label id="profileName">{window.user.name}</label>
-                       <label id="profilePoint">{window.user.customer.point} điểm</label>
+                       <label id="profileName">{window.user.user.firstName}</label>
+                       <label id="profilePoint">{window.user.user.point} điểm</label>
                    </span>
                    <div id="profileLink">
                        <div className="profileLinkWrapper">

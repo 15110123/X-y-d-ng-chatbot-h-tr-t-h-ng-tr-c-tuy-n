@@ -1,32 +1,35 @@
 import $ from "jquery";
 
 export default class RequestUtils {
-    static sendRequest(url: string, parameters: [string, string][], method: string) {
-        try {
-            let form = new FormData();
-            parameters.map(ele => {
-                form.append(ele[0], ele[1]);
-            });
+  static sendRequest(
+    url: string,
+    parameters: [string, string][],
+    method: string,
+    callBack: Function
+  ) {
+    try {
+      let data = {};
+      parameters.map(ele => {
+        data[ele[0]] = ele[1];
+      });
 
-            let settings = {
-                "async": false,
-                "crossDomain": true,
-                //"url": window.location.origin + url,
-                "url": "http://localhost:51992" + url,
-                "method": method,
-                "headers": {
-                    "Cache-Control": "no-cache"
-                },
-                "processData": false,
-                "contentType": false,
-                "mimeType": "multipart/form-data",
-                "data": form
-            };
+console.log(data);
 
-            return JSON.parse($.ajax(settings).responseText);
-        } catch (e) {
-            console.log("Có lỗi khi gửi request");
-            return null;
-        }
+      if (method == "GET")
+        return $.get(window.location.origin + url, data).done(o => {
+            //console.log(o);
+            callBack(o);
+        });
+
+        return $.post(window.location.origin + url, data).done(o => {
+            //console.log(o);
+            callBack(o);
+          });
+
+      //return JSON.parse($.ajax(settings).responseText);
+    } catch (e) {
+      console.log("Có lỗi khi gửi request " + url);
+      return null;
     }
+  }
 }

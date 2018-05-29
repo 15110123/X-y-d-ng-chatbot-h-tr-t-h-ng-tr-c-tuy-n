@@ -1,18 +1,8 @@
-using CutieShop.Models.JSONEntities.Settings;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using System.Diagnostics;
-using System.Dynamic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using RestSharp;
-using System.Net.Http;
-using System;
-using Newtonsoft.Json;
-using System.Diagnostics;
 using SelectPdf;
-using CutieShop.Models.Utils;
+using System.Net.Http;
+using System.Threading.Tasks;
 //using RazorPDFCore;
 
 namespace CutieShop.Controllers
@@ -23,7 +13,7 @@ namespace CutieShop.Controllers
         public async Task<IActionResult> index()
         {
             using (var httpClient = new HttpClient()){
-                var res = await (await httpClient.GetAsync("http://localhost:51992/api/report/all")).Content.ReadAsStringAsync();
+                var res = await (await httpClient.GetAsync("http://localhost:53730/api/reportapi/all")).Content.ReadAsStringAsync();
                 var obj = JsonConvert.DeserializeObject<dynamic>(res);
                 var IdReportNavigation_DateElWarehouse = obj[0].DateElWarehouse;
                 string IdJoin = obj.joinXX[1].idJoin;

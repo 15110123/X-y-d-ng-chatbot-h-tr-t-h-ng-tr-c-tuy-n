@@ -1,10 +1,9 @@
-using System.Dynamic;
-using System.Threading.Tasks;
 using CutieShop.API.Models.DAOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CutieShop.API.Controllers
 {
@@ -62,11 +61,11 @@ namespace CutieShop.API.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<IActionResult> GetSearchResult(string keyword)
+        public async Task<IActionResult> GetSearchResult([FromHeader]string keyword)
         {
             using (var productDAO = new ProductDAO()){
-                return Json((productDAO.Context.Product
-                .Where(x => x.Name.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) != -1))
+                return Json(await productDAO.Context.Product
+                .Where(x => x.Name.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) != -1)
                 .Select(x => new{
                     x.ProductId,
                     x.ImgUrl,
@@ -75,7 +74,7 @@ namespace CutieShop.API.Controllers
                     x.Price,
                     x.VendorId
                 })
-                .ToArray());
+                .ToArrayAsync());
             }
         }
 

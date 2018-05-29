@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CutieShop
+namespace CutieShop.API.Models.Entities
 {
     public partial class Report
     {

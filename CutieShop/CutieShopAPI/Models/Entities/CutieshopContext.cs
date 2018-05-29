@@ -1,8 +1,6 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace CutieShop
+namespace CutieShop.API.Models.Entities
 {
     public partial class CutieshopContext : DbContext
     {
