@@ -51,6 +51,7 @@ namespace CutieShop.Controllers
                     expEle.Total2 = ele.IdNtkNavigation.Total;
                     expEle.QuantityXtk = ele.IdXtkNavigation.QuantityXtk;
                     expEle.Total3 = ele.IdXtkNavigation.Total;
+                    expEle.PriceExport = ele.IdXtkNavigation.PriceExport;
                     expEle.QuantityTck = ele.IdTckNavigation.QuantityTck;
                     expEle.Total4 = ele.IdXtkNavigation.Total;
                     lstReportRow.Add(expEle);
