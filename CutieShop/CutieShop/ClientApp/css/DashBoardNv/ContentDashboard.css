@@ -1,0 +1,45 @@
+﻿.contentDashboard > .container{
+    width: 100%;
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
+    max-width: none;
+}
+
+.contentDashboard h1 {
+    text-align:center;
+}
+
+
+
+.contentDashboard #return a:hover {
+    color:green;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.contentDashboard .vertical-menu {
+    width: 100%;
+    display: block;
+}
+
+.contentDashboard .vertical-menu a {
+    background-color: #eee;
+    color: black;
+    display: block;
+    padding: 12px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.contentDashboard .vertical-menu a:hover {
+    background-color: #ccc;
+}
+
+.contentDashboard .vertical-menu a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.contentDashboard .main {
+    float:left;
+}

@@ -1,11 +1,14 @@
 ﻿//ReSharper disable All
 import * as React from "react"
-import {RouteComponentProps, Redirect} from "react-router"
-import {ProductCard} from "./ProductCard"
+import { RouteComponentProps, Redirect } from "react-router"
+import { ProductCard } from "./ProductCard"
 import "../../css/Search/search.css"
+import RequestUtils from "../../models/utils/RequestUtils"
 
-export class Search extends React.Component<RouteComponentProps<{}>, {keyword : string}> 
+export class Search extends React.Component<RouteComponentProps<{}>, { keyword: string }>
 {
+    private searchResArr: any = [{name: "Hamster winter white", price: 150000, imgUrl:"http://4.bp.blogspot.com/-WsBmyAoHD0I/T9G7XvxoAjI/AAAAAAAACBQ/0ucXCTZNn64/s1600/hamster.jpg"}];
+
     constructor(props) {
         super(props);
         let params = new URLSearchParams(this.props.location.search);
@@ -14,26 +17,22 @@ export class Search extends React.Component<RouteComponentProps<{}>, {keyword : 
 
     render() {
         return <div className="SearchContainer">
-            <label>Bạn vừa tìm {this.state.keyword}</label><br/>
+            <label>Bạn vừa tìm {this.state.keyword}</label><br />
             <div className="row">
-            <div className="col-lg-3">
-            <ProductCard Name="Hamster Winter White" Price={200000} Unit="VNĐ" ImgUrl="http://dwarfhamsterhome.com/wp-content/uploads/2016/01/winter-white-dwarf.jpg"/>
-            </div>
-            <div className="col-lg-3">
-            <ProductCard Name="Hamster Winter White" Price={200000} Unit="VNĐ" ImgUrl="http://dwarfhamsterhome.com/wp-content/uploads/2016/01/winter-white-dwarf.jpg"/>
-            </div>
-            <div className="col-lg-3">
-            <ProductCard Name="Hamster Winter White" Price={200000} Unit="VNĐ" ImgUrl="http://dwarfhamsterhome.com/wp-content/uploads/2016/01/winter-white-dwarf.jpg"/>
-            </div>
-            <div className="col-lg-3">
-            <ProductCard Name="Hamster Winter White" Price={200000} Unit="VNĐ" ImgUrl="http://dwarfhamsterhome.com/wp-content/uploads/2016/01/winter-white-dwarf.jpg"/>
-            </div>
-            <div className="col-lg-3">
-            <ProductCard Name="Hamster Winter White" Price={200000} Unit="VNĐ" ImgUrl="http://dwarfhamsterhome.com/wp-content/uploads/2016/01/winter-white-dwarf.jpg"/>
-            </div>
+
+                {
+                    this.state.keyword && this.searchResArr.map(ele => {
+                        return <div className="col-lg-3">
+                            <ProductCard Name={ele.name}
+                                Price={ele.price}
+                                Unit="VNĐ"
+                                ImgUrl={ele.imgUrl} />
+                        </div>
+                    })
+                }
             </div>
         </div>;
-    }    
+    }
 
     componentWillReceiveProps(newProps) {
         let params = new URLSearchParams(newProps.location.search);
@@ -43,6 +42,8 @@ export class Search extends React.Component<RouteComponentProps<{}>, {keyword : 
             window.location.pathname = "/";
             return;
         }
+
+        this.searchResArr = RequestUtils.sendRequest("/search", [["keyword", keyword]], "GET");
 
         this.setState({ keyword: keyword });
     }

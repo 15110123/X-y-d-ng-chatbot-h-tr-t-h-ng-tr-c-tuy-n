@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using CutieShop.API.Models.Entities;
+using System;
 
 // ReSharper disable InconsistentNaming
 
@@ -76,6 +77,19 @@ namespace CutieShop.API.Models.DAOs
             {
                 return false;
             }
+        }
+
+        public async Task<string> CreateSession(string id)
+        {
+            var guid = Guid.NewGuid().ToString();
+            await Context.Session.AddAsync(new Session
+            {
+                Username = id,
+                SessionId = guid,
+                IsDeleted = false
+            });
+            await Context.SaveChangesAsync();
+            return guid;
         }
     }
 }

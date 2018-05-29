@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 
-namespace CutieShop.API.Models.Entities
+namespace CutieShop
 {
     public partial class Service
     {

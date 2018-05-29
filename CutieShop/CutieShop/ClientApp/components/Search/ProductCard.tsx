@@ -1,5 +1,5 @@
 import * as React from "react"
-import convertUtil from "../../ConvertUtil"
+import {NumberConvertUtil} from "../../models/utils/ConvertUtils"
 import "../../css/Search/Productcard.css"
 
 export class ProductCard extends React.Component<{ Name: string, Price: number, Unit: string, ImgUrl: string}, {}>{
@@ -15,7 +15,7 @@ export class ProductCard extends React.Component<{ Name: string, Price: number, 
                 <img src={this.props.ImgUrl} />
             </div>
             <div className="PriceTag">
-                <label>{convertUtil.numberToPrice(this.props.Price, this.props.Unit)}</label>
+                <label>{NumberConvertUtil.numberToPrice(this.props.Price, this.props.Unit)}</label>
             </div>
             <div className="ProductFooter">
                 <div className="ProductName">

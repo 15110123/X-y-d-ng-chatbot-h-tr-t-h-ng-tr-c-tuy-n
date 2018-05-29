@@ -1,4 +1,7 @@
-﻿namespace CutieShop.API.Models.Entities
+﻿using System;
+using System.Collections.Generic;
+
+namespace CutieShop
 {
     public partial class Cage
     {
