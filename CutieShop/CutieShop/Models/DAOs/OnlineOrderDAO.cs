@@ -15,15 +15,8 @@ namespace CutieShop.Models.DAOs
 
         public override async Task<bool> Create(OnlineOrder entity)
         {
-            try
-            {
-                await Context.OnlineOrder.AddAsync(entity);
-                return await Context.SaveChangesAsync() != 0;
-            }
-            catch
-            {
-                return false;
-            }
+            await Context.OnlineOrder.AddAsync(entity);
+            return await Context.SaveChangesAsync() != 0;
         }
 
         public override async Task<OnlineOrder> Read(string id, bool isTracking)
@@ -44,8 +37,8 @@ namespace CutieShop.Models.DAOs
         {
             try
             {
-                return isTracking 
-                    ? Context.OnlineOrder 
+                return isTracking
+                    ? Context.OnlineOrder
                     : Context.OnlineOrder.AsNoTracking();
             }
             catch

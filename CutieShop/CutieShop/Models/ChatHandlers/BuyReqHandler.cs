@@ -215,7 +215,7 @@ namespace CutieShop.Models.ChatHandlers
                             //If user is null, create a user, then ask customer their email
                             if (user == null)
                             {
-                                Storage.AddOrUpdateToStorage(MsgId, 6, "userPassword", new GuidHelper().CreateGuid());
+                                Storage.AddOrUpdateToStorage(MsgId, 6, "userPassword", new GuidHelper().CreateGuid().Substring(0, 6));
                                 await userDAO.Create(new Auth
                                 {
                                     Username = Storage[MsgId, 5],
@@ -232,7 +232,30 @@ namespace CutieShop.Models.ChatHandlers
                             }
 
                             user = await userDAO.ReadChild(Storage[MsgId, 5], true);
-                            //If email is empty, as for email 
+
+                            if (Storage[MsgId, 6, "fullName"] == null)
+                            {
+                                if (Storage[MsgId, 6, "isAskFullName"] == null)
+                                {
+                                    Storage.AddOrUpdateToStorage(MsgId, 6, "isAskFullName", "1");
+                                    return Receiver.Json(new
+                                    {
+                                        speech = "Họ tên của bạn là gì?"
+                                    });
+                                }
+
+                                if (MsgReply.Count(x => x == ' ') == 0)
+                                {
+                                    return Receiver.Json(new
+                                    {
+                                        speech = "Vui lòng nhập đầy đủ họ tên"
+                                    });
+                                }
+
+                                Storage.AddOrUpdateToStorage(MsgId, 6, "fullName", MsgReply);
+                            }
+
+                            //If email is empty, ask for email 
                             if (user.Email == string.Empty)
                             {
                                 if (Storage[MsgId, 6, "isAskForEmail"] == null)
@@ -241,6 +264,16 @@ namespace CutieShop.Models.ChatHandlers
                                     return Receiver.Json(new
                                     {
                                         speech = "Bạn hãy cho mình biết email nhé"
+                                    });
+                                }
+
+                                //Validate email
+                                var atInd = MsgReply.IndexOf("@", StringComparison.OrdinalIgnoreCase);
+                                if (atInd < 1 || atInd == MsgReply.Length - 1)
+                                {
+                                    return Receiver.Json(new
+                                    {
+                                        speech = "Email không hợp lệ\nVui lòng nhập lại email"
                                     });
                                 }
 
@@ -273,8 +306,8 @@ namespace CutieShop.Models.ChatHandlers
                                 await onlineOrderProductDAO.Create(new OnlineOrder
                                 {
                                     OnlineOrderId = orderId,
-                                    FirstName = user.FirstName,
-                                    LastName = user.LastName,
+                                    FirstName = Storage[MsgId, 6, "fullName"].Substring(0, Storage[MsgId, 6, "fullName"].IndexOf(' ')),
+                                    LastName = Storage[MsgId, 6, "fullName"].Substring(Storage[MsgId, 6, "fullName"].IndexOf(' ') + 1),
                                     Address = user.Address,
                                     PostCode = "10000",
                                     City = user.City,
@@ -304,7 +337,7 @@ namespace CutieShop.Models.ChatHandlers
                                 var mailBody = _mailContent.BuyReq.Body
                                     .Replace("{0}", user.Username)
                                     .Replace("{1}", mailProductTable)
-                                    .Replace("{2}", "http://cutieshopapi.azurewebsites.net/verify?id=" + orderId);
+                                    .Replace("{2}", "https://cutieshop.azurewebsites.net/verify?id=" + orderId);
 
                                 MailUtils.Send(user.Email, _mailContent.BuyReq.Subject, mailBody);
 

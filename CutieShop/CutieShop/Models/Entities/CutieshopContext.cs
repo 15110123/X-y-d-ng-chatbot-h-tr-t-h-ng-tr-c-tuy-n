@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace CutieShop.Models.Entities
 {
@@ -54,7 +56,7 @@ namespace CutieShop.Models.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Data Source=cutieshop.database.windows.net;Initial Catalog=CutieShop;Persist Security Info=True;User ID=shopadmin;Password=Spkt2015");
+                optionsBuilder.UseSqlServer("Data Source=cutieshop.database.windows.net;Initial Catalog=CutieShop;User ID=shopadmin;Password=Spkt2015");
             }
         }
 
@@ -415,9 +417,7 @@ namespace CutieShop.Models.Entities
                     .IsRequired()
                     .HasMaxLength(100);
 
-                entity.Property(e => e.City)
-                    .IsRequired()
-                    .HasMaxLength(50);
+                entity.Property(e => e.City).HasMaxLength(50);
 
                 entity.Property(e => e.Email)
                     .IsRequired()

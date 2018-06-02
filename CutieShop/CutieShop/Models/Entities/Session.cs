@@ -1,4 +1,7 @@
-﻿namespace CutieShop.Models.Entities
+﻿using System;
+using System.Collections.Generic;
+
+namespace CutieShop.Models.Entities
 {
     public partial class Session
     {

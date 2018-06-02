@@ -79,7 +79,8 @@ namespace CutieShop.Controllers
                     products = x.OnlineOrderProduct.Select(y => new
                     {
                         productId = y.ProductId,
-                        quantity = y.Quantity
+                        quantity = y.Quantity,
+                        y.Product.Name
                     }),
                     totalPrice = x.OnlineOrderProduct
                         .Sum(y => y.Product.Price * y.Quantity)

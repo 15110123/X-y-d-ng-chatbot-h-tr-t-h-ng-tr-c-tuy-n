@@ -244,6 +244,16 @@ namespace CutieShop.API.Models.ChatHandlers
                                     });
                                 }
 
+                                //Validate email
+                                var atInd = MsgReply.IndexOf("@", StringComparison.OrdinalIgnoreCase);
+                                if (atInd < 1 || atInd == MsgReply.Length - 1)
+                                {
+                                    return Receiver.Json(new
+                                    {
+                                        speech = "Email không hợp lệ\nVui lòng nhập lại email"
+                                    });
+                                }
+
                                 user.Email = MsgReply;
                                 await userDAO.Context.SaveChangesAsync();
                             }

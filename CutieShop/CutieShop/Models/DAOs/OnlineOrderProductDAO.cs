@@ -15,15 +15,8 @@ namespace CutieShop.Models.DAOs
 
         public async Task<bool> CreateChild(OnlineOrderProduct childEntity)
         {
-            try
-            {
-                await Context.OnlineOrderProduct.AddAsync(childEntity);
-                return await Context.SaveChangesAsync() != 0;
-            }
-            catch
-            {
-                return false;
-            }
+            await Context.OnlineOrderProduct.AddAsync(childEntity);
+            return await Context.SaveChangesAsync() != 0;
         }
 
         public async Task<OnlineOrderProduct> ReadChild(string id, bool isTracking)
@@ -49,8 +42,8 @@ namespace CutieShop.Models.DAOs
         {
             try
             {
-                return isTracking 
-                    ? Context.OnlineOrderProduct 
+                return isTracking
+                    ? Context.OnlineOrderProduct
                     : Context.OnlineOrderProduct.AsNoTracking();
             }
             catch

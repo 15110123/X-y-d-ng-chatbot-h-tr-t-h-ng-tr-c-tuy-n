@@ -31,7 +31,10 @@ namespace CutieShop
                 options.Cookie.HttpOnly = true;
             });
             services.Configure<APISettings>(Configuration.GetSection("APISettings"));
+            services.Configure<AzureSettings>(Configuration.GetSection("AzureSettings"));
+            services.Configure<MailContent>(Configuration.GetSection("MailContent"));
             services.AddMvc();
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,10 +53,18 @@ namespace CutieShop
             {
                 //Redirect all HTTP request to HTTPS: https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl
                 //var options = new RewriteOptions().AddRedirectToHttps();
-               // app.UseRewriter(options);
+                // app.UseRewriter(options);
 
                 app.UseExceptionHandler("/Home/Error");
             }
+
+            app.UseCors(builder =>
+            {
+                builder.AllowAnyHeader()
+.AllowAnyMethod()
+.AllowAnyOrigin()
+.AllowCredentials();
+            });
 
             app.UseStaticFiles();
 

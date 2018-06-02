@@ -1,0 +1,150 @@
+﻿@using System.Net.Http
+@using Microsoft.AspNetCore.Blazor
+@inject HttpClient httpClient
+
+@page "/"
+
+@if (_onlineOrders == null)
+{
+    <h1>Đang tải dữ liệu...</h1>
+}
+else
+{
+    <h2>Cập nhật lại trong @_remainingTime.TotalSeconds giây</h2>
+    <table class="table">
+        <thead>
+            <tr style="text-align: center">
+                <th>Tên</th>
+                <th>Địa chỉ</th>
+                <th>Số điện thoại</th>
+                <th>Email</th>
+                <th style="cursor: pointer; user-select: none" onclick="@OrderByDate">Ngày</th>
+                <th>Sản phẩm (số lượng)</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in _onlineOrders)
+            {
+                <tr style="text-align: center">
+                    <td>@(order.firstName + " " + order.lastName)</td>
+                    <td>@order.address</td>
+                    <td>@order.phoneNo</td>
+                    <td>@order.email</td>
+                    <td>@order.date.ToString("dd/MM/yyyy hh:mm")</td>
+                    <td>
+                        @foreach (var product in order.products)
+                        {
+                            @product.name
+                            <text> (</text>
+                            @product.quantity
+                            <text>)</text>
+                            <br>
+                        }
+                    </td>
+                    <td>@order.statusName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@functions
+{
+    #region Others
+    OnlineOrder[] _onlineOrders;
+    TimeSpan _remainingTime = TimeSpan.FromSeconds(8);
+    string _apiHost = "https://cutieshop.azurewebsites.net";
+
+    protected override async Task OnInitAsync()
+    {
+        await UpdateOnlineOrders();
+        await TimeCounter();
+    }
+
+    async Task TimeCounter()
+    {
+        while (true)
+        {
+            if (_remainingTime.TotalSeconds == 1)
+            {
+                await UpdateOnlineOrders();
+                _remainingTime = TimeSpan.FromSeconds(8);
+            }
+            else
+                _remainingTime = _remainingTime.Subtract(TimeSpan.FromSeconds(1));
+            StateHasChanged();
+            await Task.Delay(1000);
+        }
+    }
+
+    async Task UpdateOnlineOrders()
+    {
+        _onlineOrders = await httpClient.GetJsonAsync<OnlineOrder[]>($"{_apiHost}/api/onlineorder/all");
+        if (_isDateDescending != null)
+        {
+            if ((bool)_isDateDescending)
+            {
+                _onlineOrders = _onlineOrders.OrderByDescending(x => x.date)
+                    .ToArray();
+            }
+            else
+            {
+                _onlineOrders = _onlineOrders.OrderBy(x => x.date)
+                    .ToArray();
+            }
+        }
+    } 
+    #endregion
+
+    #region Events
+
+    bool? _isDateDescending;
+
+    void OrderByDate()
+    {
+        if (_isDateDescending == null || (bool)_isDateDescending)
+        {
+            _onlineOrders = _onlineOrders
+                .OrderBy(x => x.date)
+                .ToArray();
+            _isDateDescending = false;
+        }
+        else
+        {
+            _onlineOrders = _onlineOrders
+                .OrderByDescending(x => x.date)
+                .ToArray();
+            _isDateDescending = true;
+        }
+    }
+    #endregion
+
+    #region Class Definitions
+    public class Product
+    {
+        public string productId { get; set; }
+        public int quantity { get; set; }
+        public string name { get; set; }
+    }
+
+    public class OnlineOrder
+    {
+        public string username { get; set; }
+        public string onlineOrderId { get; set; }
+        public string lastName { get; set; }
+        public string firstName { get; set; }
+        public string address { get; set; }
+        public string postCode { get; set; }
+        public string city { get; set; }
+        public string phoneNo { get; set; }
+        public string email { get; set; }
+        public DateTime date { get; set; }
+        public int statusId { get; set; }
+        public string statusName { get; set; }
+        public string statusDescription { get; set; }
+        public List<Product> products { get; set; }
+        public int totalPrice { get; set; }
+    }
+    #endregion
+}
