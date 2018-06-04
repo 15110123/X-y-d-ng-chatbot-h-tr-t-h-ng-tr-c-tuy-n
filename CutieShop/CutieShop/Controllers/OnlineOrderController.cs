@@ -10,6 +10,18 @@ namespace CutieShop.Controllers
     [Route("api/[controller]")]
     public class OnlineOrderController : Controller
     {
+        [HttpGet("verify/{orderId}")]
+        public async Task<IActionResult> VerifyOrder(string orderId)
+        {
+            using (var onlineOrderProductDao = new OnlineOrderProductDAO())
+            {
+                var order = await onlineOrderProductDao.Read(orderId, true);
+                order.StatusId = 1;
+                await onlineOrderProductDao.Context.SaveChangesAsync();
+            }
+            return View();
+        }
+
         [HttpGet("user")]
         public async Task<IActionResult> UserProductOrder()
         {

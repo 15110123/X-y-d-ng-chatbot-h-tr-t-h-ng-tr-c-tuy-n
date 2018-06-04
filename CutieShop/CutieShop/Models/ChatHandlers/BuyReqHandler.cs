@@ -240,7 +240,7 @@ namespace CutieShop.Models.ChatHandlers
                                     Storage.AddOrUpdateToStorage(MsgId, 6, "isAskFullName", "1");
                                     return Receiver.Json(new
                                     {
-                                        speech = "Họ tên của bạn là gì?"
+                                        speech = "Cho mình xin họ tên người nhận hàng?"
                                     });
                                 }
 
@@ -337,7 +337,7 @@ namespace CutieShop.Models.ChatHandlers
                                 var mailBody = _mailContent.BuyReq.Body
                                     .Replace("{0}", user.Username)
                                     .Replace("{1}", mailProductTable)
-                                    .Replace("{2}", "https://cutieshop.azurewebsites.net/verify?id=" + orderId);
+                                    .Replace("{2}", "https://cutieshop.azurewebsites.net/api/onlineorder/verify/" + orderId);
 
                                 MailUtils.Send(user.Email, _mailContent.BuyReq.Subject, mailBody);
 

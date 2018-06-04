@@ -42,7 +42,7 @@ else
                             <br>
                         }
                     </td>
-                    <td>@order.statusName</td>
+                    <td style="@(order.statusId == 0 ? "" : "color: red")">@order.statusName</td>
                 </tr>
             }
         </tbody>
@@ -59,7 +59,7 @@ else
     protected override async Task OnInitAsync()
     {
         await UpdateOnlineOrders();
-        await TimeCounter();
+        TimeCounter();
     }
 
     async Task TimeCounter()
