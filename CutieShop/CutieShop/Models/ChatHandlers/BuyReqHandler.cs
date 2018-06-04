@@ -175,6 +175,7 @@ namespace CutieShop.Models.ChatHandlers
                     }
                 #endregion
                 #region Step 5
+
                 case 5:
                     {
                         //Check if answer is valid
@@ -192,38 +193,57 @@ namespace CutieShop.Models.ChatHandlers
 
                         Storage.AddOrUpdateToStorage(MsgId, 5, null);
                         Storage.AddOrUpdateToStorage(MsgId, 4, MsgQuery);
+
+                        return Receiver.Json(new
+                        {
+                            speech = "Vui lòng nhập số lượng sản phẩm bạn muốn mua"
+                        });
+                    }
+                #endregion
+                #region Step 6
+                case 6:
+                    {
+                        if (!int.TryParse(MsgReply, out var res) || res < 1)
+                        {
+                            return Receiver.Json(new
+                            {
+                                speech = "Số lượng nhập vào không hợp lệ. Vui lòng nhập lại"
+                            });
+                        }
+                        Storage.AddOrUpdateToStorage(MsgId, 6, null);
+                        Storage.AddOrUpdateToStorage(MsgId, 5, MsgQuery);
                         return Receiver.Json(new
                         {
                             speech = "Bạn có thể cho mình biết tên đăng nhập trên hệ thống Cutieshop được không ạ?\nNếu chưa có, bạn có thể gõ tên đăng nhập mới để chúng mình tạo tài khoản cho bạn"
                         });
                     }
                 #endregion
-                #region Step 6
+                #region Step 7
 
-                case 6:
+                case 7:
                     {
                         //This step receive username first, then the email and address. So we need to keep the username to the storage for further uses, email will be used once in this step and can be queried by DAO easily in the future. 
                         //Checking null will prevent email from being overwritten to username in Storage
-                        if (Storage[MsgId, 5] == null)
+                        if (Storage[MsgId, 6] == null)
                         {
-                            Storage.AddOrUpdateToStorage(MsgId, 5, MsgReply);
+                            Storage.AddOrUpdateToStorage(MsgId, 6, MsgReply);
                         }
 
                         using (var userDAO = new UserDAO())
                         {
-                            var user = await userDAO.ReadChild(Storage[MsgId, 5], true);
+                            var user = await userDAO.ReadChild(Storage[MsgId, 6], true);
                             //If user is null, create a user, then ask customer their email
                             if (user == null)
                             {
-                                Storage.AddOrUpdateToStorage(MsgId, 6, "userPassword", new GuidHelper().CreateGuid().Substring(0, 6));
+                                Storage.AddOrUpdateToStorage(MsgId, 7, "userPassword", new GuidHelper().CreateGuid().Substring(0, 6));
                                 await userDAO.Create(new Auth
                                 {
-                                    Username = Storage[MsgId, 5],
-                                    Password = Storage[MsgId, 6, "userPassword"]
+                                    Username = Storage[MsgId, 6],
+                                    Password = Storage[MsgId, 7, "userPassword"]
                                 });
                                 await userDAO.CreateChild(new User
                                 {
-                                    Username = Storage[MsgId, 5],
+                                    Username = Storage[MsgId, 6],
                                     Email = string.Empty,
                                     Address = string.Empty
                                 });
@@ -231,13 +251,13 @@ namespace CutieShop.Models.ChatHandlers
                                 await userDAO.Context.SaveChangesAsync();
                             }
 
-                            user = await userDAO.ReadChild(Storage[MsgId, 5], true);
+                            user = await userDAO.ReadChild(Storage[MsgId, 6], true);
 
-                            if (Storage[MsgId, 6, "fullName"] == null)
+                            if (Storage[MsgId, 7, "fullName"] == null)
                             {
-                                if (Storage[MsgId, 6, "isAskFullName"] == null)
+                                if (Storage[MsgId, 7, "isAskFullName"] == null)
                                 {
-                                    Storage.AddOrUpdateToStorage(MsgId, 6, "isAskFullName", "1");
+                                    Storage.AddOrUpdateToStorage(MsgId, 7, "isAskFullName", "1");
                                     return Receiver.Json(new
                                     {
                                         speech = "Cho mình xin họ tên người nhận hàng?"
@@ -252,15 +272,15 @@ namespace CutieShop.Models.ChatHandlers
                                     });
                                 }
 
-                                Storage.AddOrUpdateToStorage(MsgId, 6, "fullName", MsgReply);
+                                Storage.AddOrUpdateToStorage(MsgId, 7, "fullName", MsgReply);
                             }
 
                             //If email is empty, ask for email 
                             if (user.Email == string.Empty)
                             {
-                                if (Storage[MsgId, 6, "isAskForEmail"] == null)
+                                if (Storage[MsgId, 7, "isAskForEmail"] == null)
                                 {
-                                    Storage.AddOrUpdateToStorage(MsgId, 6, "isAskForEmail", "1");
+                                    Storage.AddOrUpdateToStorage(MsgId, 7, "isAskForEmail", "1");
                                     return Receiver.Json(new
                                     {
                                         speech = "Bạn hãy cho mình biết email nhé"
@@ -284,9 +304,9 @@ namespace CutieShop.Models.ChatHandlers
                             //If address is empty but email is not, MsgReply must be address
                             if (user.Address == string.Empty)
                             {
-                                if (Storage[MsgId, 6, "isAskForAddress"] == null)
+                                if (Storage[MsgId, 7, "isAskForAddress"] == null)
                                 {
-                                    Storage.AddOrUpdateToStorage(MsgId, 6, "isAskForAddress", "1");
+                                    Storage.AddOrUpdateToStorage(MsgId, 7, "isAskForAddress", "1");
                                     return Receiver.Json(new
                                     {
                                         speech = "Bạn cho mình xin địa chỉ"
@@ -297,8 +317,8 @@ namespace CutieShop.Models.ChatHandlers
                                 await userDAO.Context.SaveChangesAsync();
                             }
 
-                            //Ready to jump into step 7 after this
-                            Storage.AddOrUpdateToStorage(MsgId, 6, null);
+                            //Ready to jump into step 8 (if exists) after this
+                            Storage.AddOrUpdateToStorage(MsgId, 7, null);
 
                             using (var onlineOrderProductDAO = new OnlineOrderProductDAO(userDAO.Context))
                             {
@@ -306,8 +326,8 @@ namespace CutieShop.Models.ChatHandlers
                                 await onlineOrderProductDAO.Create(new OnlineOrder
                                 {
                                     OnlineOrderId = orderId,
-                                    FirstName = Storage[MsgId, 6, "fullName"].Substring(0, Storage[MsgId, 6, "fullName"].IndexOf(' ')),
-                                    LastName = Storage[MsgId, 6, "fullName"].Substring(Storage[MsgId, 6, "fullName"].IndexOf(' ') + 1),
+                                    FirstName = Storage[MsgId, 7, "fullName"].Substring(0, Storage[MsgId, 7, "fullName"].IndexOf(' ')),
+                                    LastName = Storage[MsgId, 7, "fullName"].Substring(Storage[MsgId, 7, "fullName"].IndexOf(' ') + 1),
                                     Address = user.Address,
                                     PostCode = "10000",
                                     City = user.City,
@@ -321,7 +341,7 @@ namespace CutieShop.Models.ChatHandlers
                                 {
                                     ProductId = Storage[MsgId, 4],
                                     OnlineOrderId = orderId,
-                                    Quantity = 1
+                                    Quantity = int.Parse(Storage[MsgId, 5])
                                 });
 
                                 Product buyProduct;
@@ -332,7 +352,7 @@ namespace CutieShop.Models.ChatHandlers
                                 var mailProductTable = _mailContent.BuyReq.TableRow.
                                     Replace("{0}", buyProduct.Name)
                                     .Replace("{1}", buyProduct.Description)
-                                    .Replace("{2}", "1");
+                                    .Replace("{2}", Storage[MsgId, 5]);
 
                                 var mailBody = _mailContent.BuyReq.Body
                                     .Replace("{0}", user.Username)
@@ -345,9 +365,9 @@ namespace CutieShop.Models.ChatHandlers
                                     $"Mail xác nhận đã được gửi đến {user.Email}. Hãy xác nhận qua mail để hoàn tất đặt hàng nhé!";
 
                                 //Send temporary password if customer create new account
-                                if (Storage[MsgId, 6, "userPassword"] != null)
+                                if (Storage[MsgId, 7, "userPassword"] != null)
                                 {
-                                    reply = $"Password tạm thời của bạn là {Storage[MsgId, 6, "userPassword"]}. Bạn nên vào trang chủ để thay đổi mật khẩu mặc định\n" + reply;
+                                    reply = $"Password tạm thời của bạn là {Storage[MsgId, 7, "userPassword"]}. Bạn nên vào trang chủ để thay đổi mật khẩu mặc định\n" + reply;
                                 }
 
                                 //Remove data in storage
