@@ -1,15 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CutieShop.Models.DAOs;
 using CutieShop.Models.Entities;
 using CutieShop.Models.Exceptions;
 using CutieShop.Models.Helpers;
-using CutieShop.Models.JSONEntities.FacebookRichMessages;
 using CutieShop.Models.JSONEntities.Settings;
 using CutieShop.Models.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static CutieShop.Models.Utils.RespBuilderUtils;
 
 #pragma warning disable 4014
 
@@ -17,7 +18,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CutieShop.Models.ChatHandlers
 {
-    internal class BuyReqHandler : ChatHandler
+    public class BuyReqHandler : ChatHandler
     {
         private readonly MailContent _mailContent;
 
@@ -43,22 +44,13 @@ namespace CutieShop.Models.ChatHandlers
                         Storage.AddOrUpdateToStorage(MsgId, 1, null);
                         using (var petTypeDAO = new PetTypeDAO())
                         {
-                            return Receiver.Json(new
-                            {
-                                speech = "",
-                                messages = new[]
-                                {
-                                    new
-                                    {
-                                        type = 2,
-                                        platform = "facebook",
-                                        title = "Bạn muốn sản phẩm cho thú cưng nào ạ?",
-                                        replies = (await petTypeDAO.ReadAll(false))
-                                            .Select(x => x.Name)
-                                            .ToArray()
-                                    }
-                                }
-                            });
+                            var allPetTypes = (await petTypeDAO
+                                .ReadAll(false))
+                                .Select(x => x.Name)
+                                .ToArray();
+
+                            return Receiver.Json(RespObject(RespType.QuickReplies,
+                                "Bạn muốn sản phẩm cho thú cưng nào ạ?", allPetTypes));
                         }
                     }
                 #endregion
@@ -82,20 +74,8 @@ namespace CutieShop.Models.ChatHandlers
 
                         Storage.AddOrUpdateToStorage(MsgId, 2, null);
                         Storage.AddOrUpdateToStorage(MsgId, 1, MsgReply);
-                        return Receiver.Json(new
-                        {
-                            speech = "",
-                            messages = new[]
-                            {
-                                new
-                                {
-                                    type = 2,
-                                    platform = "facebook",
-                                    title = "Bạn muốn mua gì cho bé ạ?",
-                                    replies = new[] {"Đồ chơi", "Thức ăn", "Lồng", "phụ kiện"}
-                                }
-                            }
-                        });
+                        return Receiver.Json(RespObject(RespType.QuickReplies, "Bạn muốn mua gì cho bé ạ?",
+                            new[] { "Đồ chơi", "Thức ăn", "Lồng", "phụ kiện" }));
                     }
                 #endregion
                 #region Step 3
@@ -113,20 +93,10 @@ namespace CutieShop.Models.ChatHandlers
 
                         Storage.AddOrUpdateToStorage(MsgId, 3, null);
                         Storage.AddOrUpdateToStorage(MsgId, 2, MsgReply);
-                        return Receiver.Json(new
-                        {
-                            speech = "",
-                            messages = new[]
-                            {
-                                new
-                                {
-                                    type = 2,
-                                    platform = "facebook",
-                                    title = "Bạn có thể cho mình biết mức giá bạn muốn tìm kiếm?",
-                                    replies = new[] {"<100000", "100000 - 300000", ">300000 - 500000", ">500000"}
-                                }
-                            }
-                        });
+
+                        return Receiver.Json(RespObject(RespType.QuickReplies,
+                            "Bạn có thể cho mình biết mức giá bạn muốn tìm kiếm?",
+                            new[] { "<100000", "100000 - 300000", ">300000 - 500000", ">500000" }));
                     }
                 #endregion
                 #region Step 4
@@ -194,10 +164,7 @@ namespace CutieShop.Models.ChatHandlers
                         Storage.AddOrUpdateToStorage(MsgId, 5, null);
                         Storage.AddOrUpdateToStorage(MsgId, 4, MsgQuery);
 
-                        return Receiver.Json(new
-                        {
-                            speech = "Vui lòng nhập số lượng sản phẩm bạn muốn mua"
-                        });
+                        return Receiver.Json(RespObject(RespType.Text, "Vui lòng nhập số lượng sản phẩm bạn muốn mua"));
                     }
                 #endregion
                 #region Step 6
@@ -205,23 +172,25 @@ namespace CutieShop.Models.ChatHandlers
                     {
                         if (!int.TryParse(MsgReply, out var res) || res < 1)
                         {
-                            return Receiver.Json(new
-                            {
-                                speech = "Số lượng nhập vào không hợp lệ. Vui lòng nhập lại"
-                            });
+                            return Receiver.Json(RespObject(RespType.Text, "Số lượng nhập vào không hợp lệ. Vui lòng nhập lại"));
                         }
                         Storage.AddOrUpdateToStorage(MsgId, 6, null);
                         Storage.AddOrUpdateToStorage(MsgId, 5, MsgQuery);
-                        return Receiver.Json(new
-                        {
-                            speech = "Bạn có thể cho mình biết tên đăng nhập trên hệ thống Cutieshop được không ạ?\nNếu chưa có, bạn có thể gõ tên đăng nhập mới để chúng mình tạo tài khoản cho bạn"
-                        });
+
+                        return Receiver.Json(MultiResp(RespObject(RespType.Text,
+                            "Bạn có thể cho mình biết tên đăng nhập trên hệ thống Cutieshop được không ạ?\nNếu chưa có, bạn có thể gõ tên đăng nhập mới để chúng mình tạo tài khoản cho bạn"), RespUndo()));
                     }
                 #endregion
                 #region Step 7
 
                 case 7:
                     {
+                        if (IsUndoRequested() && Storage[MsgId, 6] == null)
+                        {
+                            Storage.StepBack(MsgId);
+                            return Receiver.Json(RespObject(RespType.Text, "Vui lòng nhập số lượng sản phẩm bạn muốn mua"));
+                        }
+
                         //This step receive username first, then the email and address. So we need to keep the username to the storage for further uses, email will be used once in this step and can be queried by DAO easily in the future. 
                         //Checking null will prevent email from being overwritten to username in Storage
                         if (Storage[MsgId, 6] == null)
@@ -258,18 +227,13 @@ namespace CutieShop.Models.ChatHandlers
                                 if (Storage[MsgId, 7, "isAskFullName"] == null)
                                 {
                                     Storage.AddOrUpdateToStorage(MsgId, 7, "isAskFullName", "1");
-                                    return Receiver.Json(new
-                                    {
-                                        speech = "Cho mình xin họ tên người nhận hàng?"
-                                    });
+
+                                    return Receiver.Json(RespObject(RespType.Text, "Cho mình xin họ tên người nhận hàng?"));
                                 }
 
                                 if (MsgReply.Count(x => x == ' ') == 0)
                                 {
-                                    return Receiver.Json(new
-                                    {
-                                        speech = "Vui lòng nhập đầy đủ họ tên"
-                                    });
+                                    return Receiver.Json(RespObject(RespType.Text, "Vui lòng nhập đầy đủ họ tên"));
                                 }
 
                                 Storage.AddOrUpdateToStorage(MsgId, 7, "fullName", MsgReply);
@@ -281,20 +245,22 @@ namespace CutieShop.Models.ChatHandlers
                                 if (Storage[MsgId, 7, "isAskForEmail"] == null)
                                 {
                                     Storage.AddOrUpdateToStorage(MsgId, 7, "isAskForEmail", "1");
-                                    return Receiver.Json(new
-                                    {
-                                        speech = "Bạn hãy cho mình biết email nhé"
-                                    });
+                                    return Receiver.Json(MultiResp(RespObject(RespType.Text, "Bạn hãy cho mình biết email nhé"), RespUndo()));
+                                }
+
+                                //Undo handling
+                                if (IsUndoRequested())
+                                {
+                                    Storage.AddOrUpdateToStorage(MsgId, 7, "fullName", null);
+                                    Storage.AddOrUpdateToStorage(MsgId, 7, "isAskForEmail", null);
+                                    return Receiver.Json(RespObject(RespType.Text, "Cho mình xin họ tên người nhận hàng?"));
                                 }
 
                                 //Validate email
                                 var atInd = MsgReply.IndexOf("@", StringComparison.OrdinalIgnoreCase);
                                 if (atInd < 1 || atInd == MsgReply.Length - 1)
                                 {
-                                    return Receiver.Json(new
-                                    {
-                                        speech = "Email không hợp lệ\nVui lòng nhập lại email"
-                                    });
+                                    return Receiver.Json(RespObject(RespType.Text, "Email không hợp lệ\nVui lòng nhập lại email"));
                                 }
 
                                 user.Email = MsgReply;
@@ -307,10 +273,7 @@ namespace CutieShop.Models.ChatHandlers
                                 if (Storage[MsgId, 7, "isAskForAddress"] == null)
                                 {
                                     Storage.AddOrUpdateToStorage(MsgId, 7, "isAskForAddress", "1");
-                                    return Receiver.Json(new
-                                    {
-                                        speech = "Bạn cho mình xin địa chỉ"
-                                    });
+                                    return Receiver.Json(RespObject(RespType.Text, "Bạn cho mình xin địa chỉ"));
                                 }
 
                                 user.Address = MsgReply;
@@ -373,10 +336,7 @@ namespace CutieShop.Models.ChatHandlers
                                 //Remove data in storage
                                 Storage.RemoveId(MsgId);
 
-                                return Receiver.Json(new
-                                {
-                                    speech = reply
-                                });
+                                return Receiver.Json(RespObject(RespType.Text, reply));
                             }
                         }
                     }
@@ -390,123 +350,32 @@ namespace CutieShop.Models.ChatHandlers
 
         private async Task<IActionResult> MessengerProductListResult(Type childType, int minPrice, int maxPrice)
         {
-            MessCard[] messages;
-            if (childType == typeof(Toy))
-            {
-                messages = (await new ToyDAO().ReadAllChild(false))
-                    .Include(x => x.Product)
-                    .Include(x => x.Product.ProductForPetType)
-                    .Where(x => x.Product.Price >= minPrice
-                                && x.Product.Price <= maxPrice
-                                && x.Product.ProductForPetType.Any(y => y.PetType.Name == Storage[MsgId, 1, ""]))
-                    .Select(x => new MessCard
-                    {
-                        type = 1,
-                        platform = "facebook",
-                        title = x.Product.Name,
-                        subtitle = x.Product.Price.ToString(),
-                        imageUrl = x.Product.ImgUrl,
-                        buttons = new[]
-                        {
-                            new Button
-                            {
-                                text = "Đặt liền",
-                                postback = x.ProductId
-                            }
-                        }
-                    }).ToArray();
-            }
-            else if (childType == typeof(Food))
-            {
-                messages = (await new FoodDAO().ReadAllChild(false))
-                    .Include(x => x.Product)
-                    .Include(x => x.Product.ProductForPetType)
-                    .Where(x => x.Product.Price >= minPrice
-                                && x.Product.Price <= maxPrice
-                                && x.Product.ProductForPetType.Any(y => y.PetType.Name == Storage[MsgId, 1, ""]))
-                    .Select(x => new MessCard
-                    {
-                        type = 1,
-                        platform = "facebook",
-                        title = x.Product.Name,
-                        subtitle = x.Product.Price.ToString(),
-                        imageUrl = x.Product.ImgUrl,
-                        buttons = new[]
-                        {
-                            new Button
-                            {
-                                text = "Đặt liền",
-                                postback = x.ProductId
-                            }
-                        }
-                    }).ToArray();
-            }
-            else if (childType == typeof(Cage))
-            {
-                messages = (await new CageDAO().ReadAllChild(false))
-                    .Include(x => x.Product)
-                    .Include(x => x.Product.ProductForPetType)
-                    .Where(x => x.Product.Price >= minPrice
-                                && x.Product.Price <= maxPrice
-                                && x.Product.ProductForPetType.Any(y => y.PetType.Name == Storage[MsgId, 1, ""]))
-                    .Select(x => new MessCard
-                    {
-                        type = 1,
-                        platform = "facebook",
-                        title = x.Product.Name,
-                        subtitle = x.Product.Price.ToString(),
-                        imageUrl = x.Product.ImgUrl,
-                        buttons = new[]
-                        {
-                            new Button
-                            {
-                                text = "Đặt liền",
-                                postback = x.ProductId
-                            }
-                        }
-                    }).ToArray();
-            }
-            else
-            {
-                messages = (await new AccessoryDAO().ReadAllChild(false))
-                    .Include(x => x.Product)
-                    .Include(x => x.Product.ProductForPetType)
-                    .Where(x => x.Product.Price >= minPrice
-                                && x.Product.Price <= maxPrice
-                                && x.Product.ProductForPetType.Any(y => y.PetType.Name == Storage[MsgId, 1, ""]))
-                    .Select(x => new MessCard
-                    {
-                        type = 1,
-                        platform = "facebook",
-                        title = x.Product.Name,
-                        subtitle = x.Product.Price.ToString(),
-                        imageUrl = x.Product.ImgUrl,
-                        buttons = new[]
-                        {
-                            new Button
-                            {
-                                text = "Đặt liền",
-                                postback = x.ProductId
-                            }
-                        }
-                    }).ToArray();
-            }
+            var msgs = (await new CutieshopContext().Product
+                .Include(x => x.ProductForPetType)
+                .ThenInclude(x => x.PetType)
+                .Include(x => x.Accessory)
+                .Include(x => x.Cage)
+                .Include(x => x.Food)
+                .Include(x => x.Toy)
+                .ToArrayAsync())
+                .Where(x => ProductEqualTypeNotNull(x, childType)
+                && x.Price >= minPrice
+                && x.Price <= maxPrice
+                && x.ProductForPetType.Any(y => y.PetType.Name == Storage[MsgId, 1]))
+                .Select(x => new { x.Name, Price = x.Price.ToString(), x.ProductId, x.ImgUrl, BtnText = "Đặt liền" })
+                .Select(ele => (ele.Name, ele.Price, ele.ProductId, ele.ImgUrl, ele.BtnText))
+                .ToArray();
 
             //Return message
-            if (messages.Any())
-                return Receiver.Json(new
-                {
-                    speech = "",
-                    messages
-                });
+            if (msgs.Any())
+                return Receiver.Json(RespObject(RespType.Cards, "", cards: msgs));
 
-            //Delete data when no products found
-            Storage.RemoveId(MsgId);
-            return Receiver.Json(new
-            {
-                speech = "Xin lỗi bạn. Chúng mình tạm thời không còn bán loại hàng này."
-            });
-
+            //Require user to choose another price
+            //Storage.RemoveId(MsgId);
+            Storage.StepBack(MsgId);
+            return Receiver.Json(RespObject(RespType.QuickReplies,
+                "Xin lỗi bạn. Chúng mình tạm thời không còn bán loại hàng này. Bạn vui lòng chọn mức giá khác",
+                new[] {"<100000", "100000 - 300000", ">300000 - 500000", ">500000"}));
         }
 
         private Type GetProductType()
@@ -534,6 +403,26 @@ namespace CutieShop.Models.ChatHandlers
                         throw new UnhandledChatException();
                     }
             }
+        }
+
+        private bool ProductEqualTypeNotNull(Product o, Type t)
+        {
+            if (t == typeof(Toy) && o.Toy != null
+                || t == typeof(Food) && o.Food != null
+                || t == typeof(Cage) && o.Cage != null)
+                return true;
+            return t == typeof(Accessory) && o.Accessory != null;
+        }
+
+        private object RespUndo()
+        {
+            return RespObject(RespType.Button, "Click để quay lại", btnTitle: "Quay lại", btnPayload: "undo");
+        }
+
+        private bool IsUndoRequested()
+        {
+            return MsgQuery == "undo";
+
         }
     }
 }

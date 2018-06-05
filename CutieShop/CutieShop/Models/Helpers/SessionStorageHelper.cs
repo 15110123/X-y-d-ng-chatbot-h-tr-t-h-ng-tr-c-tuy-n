@@ -10,7 +10,7 @@ namespace CutieShop.Models.Helpers
     /// <summary>
     /// Session Storage Helper
     /// </summary>
-    internal class SessionStorageHelper
+    public class SessionStorageHelper
     {
 
         private static readonly Dictionary<Type, Dictionary<string, Dictionary<int, Dictionary<string, string>>>> Storage;
@@ -90,6 +90,12 @@ namespace CutieShop.Models.Helpers
             if (!Storage.ContainsKey(_chatHandler.GetType()) ||
                 !Storage[_chatHandler.GetType()].ContainsKey(id)) return;
             Storage[_chatHandler.GetType()][id].Remove(step);
+        }
+
+        public void StepBack(string id)
+        {
+            var curStep = GetCurrentStep(id);
+            RemoveStep(id, curStep);
         }
 
         private void AddId(string id)

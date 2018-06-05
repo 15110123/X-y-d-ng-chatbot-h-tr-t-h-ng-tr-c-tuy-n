@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CutieShop.Models.ChatHandlers
 {
-    internal interface IChatHandler
+    public interface IChatHandler
     {
         Task<IActionResult> Result();
     }

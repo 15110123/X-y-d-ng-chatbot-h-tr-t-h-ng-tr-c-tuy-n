@@ -5,7 +5,7 @@ using static CutieShop.Models.Utils.ChatRequestUtils;
 
 namespace CutieShop.Models.ChatHandlers
 {
-    internal abstract class ChatHandler : IChatHandler
+    public abstract class ChatHandler : IChatHandler
     {
         protected SessionStorageHelper Storage;
         protected Controller Receiver;
