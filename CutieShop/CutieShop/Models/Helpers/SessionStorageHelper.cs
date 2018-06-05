@@ -12,7 +12,7 @@ namespace CutieShop.Models.Helpers
     /// </summary>
     public class SessionStorageHelper
     {
-
+        //This is actually a global storage: all SessionStorageHelper can access this variable. If storage is initialized every time this helper is created, previous data will be lost
         private static readonly Dictionary<Type, Dictionary<string, Dictionary<int, Dictionary<string, string>>>> Storage;
 
         private readonly IChatHandler _chatHandler;
@@ -54,7 +54,7 @@ namespace CutieShop.Models.Helpers
         /// <param name="step"></param>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        public void AddOrUpdateToStorage(string id, int step, string key, string value)
+        public void AddOrUpdate(string id, int step, string key, string value)
         {
             //Add new secondary dictionary if Storage doesn't have the key _chatHandler
             if (!Storage.ContainsKey(_chatHandler.GetType()))
@@ -80,9 +80,9 @@ namespace CutieShop.Models.Helpers
         /// <param name="id"></param>
         /// <param name="step"></param>
         /// <param name="value"></param>
-        public void AddOrUpdateToStorage(string id, int step, string value)
+        public void AddOrUpdate(string id, int step, string value)
         {
-            AddOrUpdateToStorage(id, step, "", value);
+            AddOrUpdate(id, step, "", value);
         }
 
         public void RemoveStep(string id, int step)
@@ -113,6 +113,13 @@ namespace CutieShop.Models.Helpers
             return Storage[_chatHandler.GetType()][id]
                 .Where(x => x.Value.ContainsKey(""))
                 .Max(x => x.Key);
+        }
+
+        public void AddOrUpdateAndMoveNext(string id, string curData)
+        {
+            var curStep = GetCurrentStep(id);
+            AddOrUpdate(id, curStep + 1, null);
+            AddOrUpdate(id, curStep, curData);
         }
 
         public static void RemoveAllById(string id)

@@ -8,7 +8,8 @@ namespace CutieShop.Models.ChatHandlers
     public abstract class ChatHandler : IChatHandler
     {
         protected SessionStorageHelper Storage;
-        protected Controller Receiver;
+        //Receiver (receiving controller)
+        protected Controller Recv;
         protected dynamic Request;
 
         protected string MsgId => GetMessengerSenderId(Request);
@@ -18,7 +19,7 @@ namespace CutieShop.Models.ChatHandlers
         protected ChatHandler(Controller receiver, dynamic request)
         {
             Storage = new SessionStorageHelper(this);
-            Receiver = receiver;
+            Recv = receiver;
             Request = request;
         }
 

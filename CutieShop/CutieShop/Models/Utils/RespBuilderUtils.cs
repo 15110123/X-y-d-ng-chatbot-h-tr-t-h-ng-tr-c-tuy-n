@@ -15,7 +15,7 @@ namespace CutieShop.Models.Utils
             Button
         }
 
-        public static object RespObject(RespType type,
+        public static object RespObj(RespType type,
             string msg,
             string[] replyTitles = null,
             (string Title, string Subtitle, string PostBack, string CardImg, string BtnText)[] cards = null,

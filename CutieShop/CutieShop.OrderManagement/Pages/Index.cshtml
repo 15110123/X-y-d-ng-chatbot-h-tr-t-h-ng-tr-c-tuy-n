@@ -27,7 +27,7 @@ else
             @foreach (var order in _onlineOrders)
             {
                 <tr style="text-align: center">
-                    <td>@(order.firstName + " " + order.lastName)</td>
+                    <td>@(order.lastName + " " + order.firstName)</td>
                     <td>@order.address</td>
                     <td>@order.phoneNo</td>
                     <td>@order.email</td>
