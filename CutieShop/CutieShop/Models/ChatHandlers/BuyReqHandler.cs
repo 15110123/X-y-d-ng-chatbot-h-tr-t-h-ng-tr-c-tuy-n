@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using CutieShop.Models.DAOs;
 using CutieShop.Models.Entities;
@@ -11,6 +12,7 @@ using CutieShop.Models.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static CutieShop.Models.Utils.RespBuilderUtils;
+using static CutieShop.Models.Utils.TextUtils;
 
 #pragma warning disable 4014
 
@@ -193,8 +195,12 @@ namespace CutieShop.Models.ChatHandlers
 
                         //This step receive username first, then the email and address. So we need to keep the username to the storage for further uses, email will be used once in this step and can be queried by DAO easily in the future. 
                         //Checking null will prevent email from being overwritten to username in Storage
+
                         if (Storage[MsgId, 6] == null)
                         {
+                            if (!IsPureAscii(MsgReply) || MsgReply.Contains(' '))
+                                return Receiver.Json(RespObject(RespType.Text, "Vui lòng nhập tên đăng nhập hợp lệ (không dấu, khoảng cách)"));
+
                             Storage.AddOrUpdateToStorage(MsgId, 6, MsgReply);
                         }
 
