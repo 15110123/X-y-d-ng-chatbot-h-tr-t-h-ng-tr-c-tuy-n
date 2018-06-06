@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CutieShop.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using static CutieShop.Models.Extensions.StringExtension;
 
 // ReSharper disable InconsistentNaming
 
@@ -20,19 +21,19 @@ namespace CutieShop.Models.DAOs
             return await Context.SaveChangesAsync() != 0;
         }
 
-        public async Task<bool> Create(string onlineOrderId, string firstName, string lastName, string address, string postCode, string city, string phoneNo, string email, DateTime date, string username, int statusId)
+        public async Task<bool> Create(string onlineOrderId, string fullName, string address, string postCode, string city, string phoneNo, string email, string username, int statusId)
         {
             return await Create(new OnlineOrder
             {
                 OnlineOrderId = onlineOrderId,
-                FirstName = firstName,
-                LastName = lastName,
+                FirstName = fullName.FirstName(),
+                LastName = fullName.LastName(),
                 Address = address,
                 PostCode = postCode,
                 City = city,
                 PhoneNo = phoneNo,
                 Email = email,
-                Date = date,
+                Date = DateTime.Now,
                 Username = username,
                 StatusId = statusId
             });

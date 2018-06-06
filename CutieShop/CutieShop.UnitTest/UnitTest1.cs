@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using static CutieShop.Models.Utils.RespBuilderUtils;
-using static CutieShop.Models.Utils.TextUtils;
+using static CutieShop.Models.Extensions.StringExtension;
 
 namespace CutieShop.UnitTest
 {

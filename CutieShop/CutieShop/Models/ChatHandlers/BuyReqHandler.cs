@@ -5,11 +5,10 @@ using CutieShop.Models.JSONEntities.Settings;
 using CutieShop.Models.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
+using static CutieShop.Models.Extensions.StringExtension;
 using static CutieShop.Models.Utils.RespBuilderUtils;
-using static CutieShop.Models.Utils.TextUtils;
 using static System.Guid;
 
 #pragma warning disable 4014
@@ -18,12 +17,13 @@ using static System.Guid;
 
 namespace CutieShop.Models.ChatHandlers
 {
-    public class BuyReqHandler : ChatHandler
+    public partial class BuyReqHandler : ChatHandler
     {
         private readonly MailContent _mailContent;
 
         //There might be data validations for some steps. Remember, by jump into different step, MsgReply and other data should be also different. You may want to skip validation if you want to jump into other step to let it return its' message. 
         private bool _isSkipValidation;
+        private bool _isUndoRequested => MsgQuery == "undo";
 
         public BuyReqHandler(Controller receiver, dynamic request, MailContent mailContent)
             : base(receiver, (object)request)
@@ -98,14 +98,11 @@ namespace CutieShop.Models.ChatHandlers
                 case 4:
                     //Check if answer is valid
                     if (!_isSkipValidation)
-                    {
-                        if (new[] { "<100000", "100000 - 300000", ">300000 - 500000", ">500000" }.All(x =>
-                              x != MsgReply))
+                        if (new[] { "<100000", "100000 - 300000", ">300000 - 500000", ">500000" }.All(x => x != MsgReply))
                         {
                             _isSkipValidation = true;
                             goto case 3;
                         }
-                    }
 
                     Storage.AddOrUpdateAndMoveNext(MsgId, MsgReply);
 
@@ -140,16 +137,12 @@ namespace CutieShop.Models.ChatHandlers
                 case 5:
                     //Check if answer is valid
                     if (!_isSkipValidation)
-                    {
                         using (var productDAO = new ProductDAO())
-                        {
                             if (await productDAO.Read(MsgQuery, false) == null)
                             {
                                 _isSkipValidation = true;
                                 goto case 4;
                             }
-                        }
-                    }
 
                     Storage.AddOrUpdateAndMoveNext(MsgId, MsgQuery);
 
@@ -159,10 +152,8 @@ namespace CutieShop.Models.ChatHandlers
                 #region Step 6
                 case 6:
                     if (!int.TryParse(MsgReply, out var res) || res < 1)
-                    {
                         return Recv.Json(RespObj(RespType.Text,
                             "Số lượng nhập vào không hợp lệ. Vui lòng nhập lại"));
-                    }
 
                     Storage.AddOrUpdateAndMoveNext(MsgId, MsgQuery);
 
@@ -173,7 +164,7 @@ namespace CutieShop.Models.ChatHandlers
                 #endregion
                 #region Step 7
                 case 7:
-                    if (IsUndoRequested() && Storage[MsgId, 6] == null)
+                    if (_isUndoRequested && Storage[MsgId, 6] == null)
                     {
                         Storage.StepBack(MsgId);
                         return Recv.Json(RespObj(RespType.Text, "Vui lòng nhập số lượng sản phẩm bạn muốn mua"));
@@ -184,7 +175,7 @@ namespace CutieShop.Models.ChatHandlers
 
                     if (Storage[MsgId, 6] == null)
                     {
-                        if (!IsPureAscii(MsgReply) || MsgReply.Contains(' '))
+                        if (!MsgReply.IsPureAscii() || MsgReply.Contains(' '))
                             return Recv.Json(RespObj(RespType.Text, "Vui lòng nhập tên đăng nhập hợp lệ (không dấu, khoảng cách)"));
                         Storage.AddOrUpdate(MsgId, 6, MsgReply);
                     }
@@ -218,7 +209,6 @@ namespace CutieShop.Models.ChatHandlers
                             if (Storage[MsgId, 7, "isAskFullName"] == null)
                             {
                                 Storage.AddOrUpdate(MsgId, 7, "isAskFullName", "1");
-
                                 return Recv.Json(RespObj(RespType.Text, "Cho mình xin họ tên người nhận hàng?"));
                             }
 
@@ -239,7 +229,7 @@ namespace CutieShop.Models.ChatHandlers
                             }
 
                             //Undo handling
-                            if (IsUndoRequested())
+                            if (_isUndoRequested)
                             {
                                 Storage.AddOrUpdate(MsgId, 7, "fullName", null);
                                 Storage.AddOrUpdate(MsgId, 7, "isAskForEmail", null);
@@ -247,8 +237,7 @@ namespace CutieShop.Models.ChatHandlers
                             }
 
                             //Validate email
-                            var atInd = MsgReply.IndexOf("@", StringComparison.OrdinalIgnoreCase);
-                            if (atInd < 1 || atInd == MsgReply.Length - 1)
+                            if (!MsgReply.IsEmail())
                                 return Recv.Json(RespObj(RespType.Text, "Email không hợp lệ\nVui lòng nhập lại email"));
 
                             user.Email = MsgReply;
@@ -256,19 +245,18 @@ namespace CutieShop.Models.ChatHandlers
                         }
 
                         if (Storage[MsgId, 7, "phoneNo"] == null)
-                        {
                             switch (Storage[MsgId, 7, "isAskForPhoneNo"])
                             {
                                 case null:
                                     Storage.AddOrUpdate(MsgId, 7, "isAskForPhoneNo", "1");
-                                    return Recv.Json(MultiResp(RespObj(RespType.Text, "Bạn cho mình xin số điện thoại ạ"), RespUndo()));
+                                    return Recv.Json(MultiResp(
+                                        RespObj(RespType.Text, "Bạn cho mình xin số điện thoại ạ"), RespUndo()));
                                 case "1":
                                     Storage.AddOrUpdate(MsgId, 7, "phoneNo", MsgReply);
                                     break;
                             }
-                        }
 
-                        if (IsUndoRequested())
+                        if (_isUndoRequested)
                         {
                             user.Address = "";
                             await userDAO.Context.SaveChangesAsync();
@@ -292,26 +280,21 @@ namespace CutieShop.Models.ChatHandlers
                         //Ready to jump into step 8 (if exists) after this
                         Storage.AddOrUpdate(MsgId, 7, null);
 
-                        using (var dao = new OnlineOrderProductDAO(userDAO.Context))
+                        using (var orderDAO = new OnlineOrderProductDAO(userDAO.Context))
                         {
                             var orderId = NewGuid().ToString();
-                            await dao.Create(orderId, Storage[MsgId, 7, "fullName"].FirstName(), Storage[MsgId, 7, "fullName"].LastName(), user.Address, "10000", user.City, Storage[MsgId, 7, "phoneNo"], user.Email, DateTime.Now, user.Username, 0);
-                            await dao.CreateChild(Storage[MsgId, 4], orderId, int.Parse(Storage[MsgId, 5]));
+                            await orderDAO.Create(orderId, Storage[MsgId, 7, "fullName"], user.Address, "10000", user.City, Storage[MsgId, 7, "phoneNo"], user.Email, user.Username, 0);
+                            await orderDAO.CreateChild(Storage[MsgId, 4], orderId, int.Parse(Storage[MsgId, 5]));
 
                             Product buyProd;
                             using (var prdctDAO = new ProductDAO())
                                 buyProd = await prdctDAO.Read(Storage[MsgId, 4], false);
 
                             var mailPrdctTbl = _mailContent.BuyReq.TableRow
-                                .Replace("{0}", buyProd.Name)
-                                .Replace("{1}", buyProd.Description)
-                                .Replace("{2}", Storage[MsgId, 5]);
+                                .MultiReplace(("{0}", buyProd.Name), ("{1}", buyProd.Description), ("{2}", Storage[MsgId, 5]));
 
                             var mailBody = _mailContent.BuyReq.Body
-                                .Replace("{0}", user.Username)
-                                .Replace("{1}", mailPrdctTbl)
-                                .Replace("{2}",
-                                    "https://cutieshop.azurewebsites.net/api/onlineorder/verify/" + orderId);
+                                .MultiReplace(("{0}", user.Username), ("{1}", mailPrdctTbl), ("{2}", orderId));
 
                             MailUtils.Send(user.Email, _mailContent.BuyReq.Subject, mailBody);
 
@@ -319,9 +302,7 @@ namespace CutieShop.Models.ChatHandlers
 
                             //Send temporary password if customer create new account
                             if (Storage[MsgId, 7, "userPassword"] != null)
-                            {
                                 reply = $"Password tạm thời của bạn là {Storage[MsgId, 7, "userPassword"]}. Bạn nên vào trang chủ để thay đổi mật khẩu mặc định\n" + reply;
-                            }
 
                             //Remove data in storage
                             Storage.RemoveId(MsgId);
@@ -333,72 +314,6 @@ namespace CutieShop.Models.ChatHandlers
 
             Storage.RemoveId(MsgId);
             throw new UnhandledChatException();
-        }
-
-        private async Task<IActionResult> MessengerProductListResult(Type childType, int minPrice, int maxPrice)
-        {
-            var msgs = (await new CutieshopContext().Product
-                .Include(x => x.ProductForPetType)
-                .ThenInclude(x => x.PetType)
-                .Include(x => x.Accessory)
-                .Include(x => x.Cage)
-                .Include(x => x.Food)
-                .Include(x => x.Toy)
-                .ToArrayAsync())
-                .Where(x => ProductEqualTypeNotNull(x, childType)
-                && x.Price >= minPrice
-                && x.Price <= maxPrice
-                && x.ProductForPetType.Any(y => y.PetType.Name == Storage[MsgId, 1]))
-                .Select(x => new { x.Name, Price = x.Price.ToString(), x.ProductId, x.ImgUrl, BtnText = "Đặt liền" })
-                .Select(ele => (ele.Name, ele.Price, ele.ProductId, ele.ImgUrl, ele.BtnText))
-                .ToArray();
-
-            //Return message
-            if (msgs.Any())
-                return Recv.Json(RespObj(RespType.Cards, "", cards: msgs));
-
-            //Require user to choose another price
-            //Storage.RemoveId(MsgId);
-            Storage.StepBack(MsgId);
-            return Recv.Json(RespObj(RespType.QuickReplies,
-                "Xin lỗi bạn. Chúng mình tạm thời không còn bán loại hàng này. Bạn vui lòng chọn mức giá khác",
-                new[] { "<100000", "100000 - 300000", ">300000 - 500000", ">500000" }));
-        }
-
-        private Type GetProductType()
-        {
-            switch (Storage[MsgId, 2])
-            {
-                case "Đồ chơi":
-                    return typeof(Toy);
-                case "Thức ăn":
-                    return typeof(Food);
-                case "Lồng":
-                    return typeof(Cage);
-                case "phụ kiện":
-                    return typeof(Accessory);
-                default:
-                    throw new UnhandledChatException();
-            }
-        }
-
-        private bool ProductEqualTypeNotNull(Product o, Type t)
-        {
-            if (t == typeof(Toy) && o.Toy != null
-                || t == typeof(Food) && o.Food != null
-                || t == typeof(Cage) && o.Cage != null)
-                return true;
-            return t == typeof(Accessory) && o.Accessory != null;
-        }
-
-        private object RespUndo()
-        {
-            return RespObj(RespType.Button, "Click để quay lại", btnTitle: "Quay lại", btnPayload: "undo");
-        }
-
-        private bool IsUndoRequested()
-        {
-            return MsgQuery == "undo";
         }
     }
 }
