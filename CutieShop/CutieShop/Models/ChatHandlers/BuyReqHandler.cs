@@ -255,13 +255,34 @@ namespace CutieShop.Models.ChatHandlers
                             await userDAO.Context.SaveChangesAsync();
                         }
 
-                        //If address is empty but email is not, MsgReply must be address
+                        if (Storage[MsgId, 7, "phoneNo"] == null)
+                        {
+                            switch (Storage[MsgId, 7, "isAskForPhoneNo"])
+                            {
+                                case null:
+                                    Storage.AddOrUpdate(MsgId, 7, "isAskForPhoneNo", "1");
+                                    return Recv.Json(MultiResp(RespObj(RespType.Text, "Bạn cho mình xin số điện thoại ạ"), RespUndo()));
+                                case "1":
+                                    Storage.AddOrUpdate(MsgId, 7, "phoneNo", MsgReply);
+                                    break;
+                            }
+                        }
+
+                        if (IsUndoRequested())
+                        {
+                            user.Address = "";
+                            await userDAO.Context.SaveChangesAsync();
+                            Storage.AddOrUpdate(MsgId, 7, "phoneNo", null);
+                            Storage.AddOrUpdate(MsgId, 7, "isAskForAddress", null);
+                            return Recv.Json(RespObj(RespType.Text, "Bạn cho mình xin số điện thoại ạ"));
+                        }
+
                         if (user.Address == string.Empty)
                         {
                             if (Storage[MsgId, 7, "isAskForAddress"] == null)
                             {
                                 Storage.AddOrUpdate(MsgId, 7, "isAskForAddress", "1");
-                                return Recv.Json(RespObj(RespType.Text, "Bạn cho mình xin địa chỉ"));
+                                return Recv.Json(MultiResp(RespObj(RespType.Text, "Bạn cho mình xin địa chỉ"), RespUndo()));
                             }
 
                             user.Address = MsgReply;
@@ -274,26 +295,8 @@ namespace CutieShop.Models.ChatHandlers
                         using (var dao = new OnlineOrderProductDAO(userDAO.Context))
                         {
                             var orderId = NewGuid().ToString();
-                            await dao.Create(new OnlineOrder
-                            {
-                                OnlineOrderId = orderId,
-                                FirstName = Storage[MsgId, 7, "fullName"].FirstName(),
-                                LastName = Storage[MsgId, 7, "fullName"].LastName(),
-                                Address = user.Address,
-                                PostCode = "10000",
-                                City = user.City,
-                                PhoneNo = "12345678",
-                                Email = user.Email,
-                                Date = DateTime.Now,
-                                Username = user.Username,
-                                StatusId = 0
-                            });
-                            await dao.CreateChild(new OnlineOrderProduct
-                            {
-                                ProductId = Storage[MsgId, 4],
-                                OnlineOrderId = orderId,
-                                Quantity = int.Parse(Storage[MsgId, 5])
-                            });
+                            await dao.Create(orderId, Storage[MsgId, 7, "fullName"].FirstName(), Storage[MsgId, 7, "fullName"].LastName(), user.Address, "10000", user.City, Storage[MsgId, 7, "phoneNo"], user.Email, DateTime.Now, user.Username, 0);
+                            await dao.CreateChild(Storage[MsgId, 4], orderId, int.Parse(Storage[MsgId, 5]));
 
                             Product buyProd;
                             using (var prdctDAO = new ProductDAO())

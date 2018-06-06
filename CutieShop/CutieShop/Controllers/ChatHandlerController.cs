@@ -62,7 +62,7 @@ namespace CutieShop.Controllers
             }
             catch (Exception e)
             {
-                return Json(new { speech = e.Message + e.StackTrace });
+                return Json(new { speech = e.InnerException.Message + e.InnerException.StackTrace });
             }
         }
     }

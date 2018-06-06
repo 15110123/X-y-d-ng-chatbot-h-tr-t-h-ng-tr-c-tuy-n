@@ -19,6 +19,16 @@ namespace CutieShop.Models.DAOs
             return await Context.SaveChangesAsync() != 0;
         }
 
+        public async Task<bool> CreateChild(string productId, string orderId, int quantity)
+        {
+            return await CreateChild(new OnlineOrderProduct
+            {
+                ProductId = productId,
+                OnlineOrderId = orderId,
+                Quantity = quantity
+            });
+        }
+
         public async Task<OnlineOrderProduct> ReadChild(string id, bool isTracking)
         {
             try

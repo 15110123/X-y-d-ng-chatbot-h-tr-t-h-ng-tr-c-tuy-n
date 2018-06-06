@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using CutieShop.Models.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,24 @@ namespace CutieShop.Models.DAOs
         {
             await Context.OnlineOrder.AddAsync(entity);
             return await Context.SaveChangesAsync() != 0;
+        }
+
+        public async Task<bool> Create(string onlineOrderId, string firstName, string lastName, string address, string postCode, string city, string phoneNo, string email, DateTime date, string username, int statusId)
+        {
+            return await Create(new OnlineOrder
+            {
+                OnlineOrderId = onlineOrderId,
+                FirstName = firstName,
+                LastName = lastName,
+                Address = address,
+                PostCode = postCode,
+                City = city,
+                PhoneNo = phoneNo,
+                Email = email,
+                Date = date,
+                Username = username,
+                StatusId = statusId
+            });
         }
 
         public override async Task<OnlineOrder> Read(string id, bool isTracking)
