@@ -212,7 +212,7 @@ namespace CutieShop.Models.ChatHandlers
                                 return Recv.Json(RespObj(RespType.Text, "Cho mình xin họ tên người nhận hàng?"));
                             }
 
-                            if (MsgReply.Count(x => x == ' ') == 0)
+                            if (MsgReply.Trim().Count(x => x == ' ') == 0)
                                 return Recv.Json(RespObj(RespType.Text, "Vui lòng nhập đầy đủ họ tên"));
 
                             Storage.AddOrUpdate(MsgId, 7, "fullName", MsgReply);

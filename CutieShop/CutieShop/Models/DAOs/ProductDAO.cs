@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CutieShop.Models.DAOs
 {
-    public class ProductDAO : CutieshopDAO<string, Product>
+    public sealed class ProductDAO : CutieshopDAO<string, Product>
     {
         public ProductDAO(CutieshopContext context = null) : base(context)
         {

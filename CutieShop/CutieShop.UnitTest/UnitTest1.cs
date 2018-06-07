@@ -22,10 +22,10 @@ namespace CutieShop.UnitTest
         public void IsPureAsciiTest()
         {
             //Is true
-            Assert.IsTrue(IsPureAscii("xin chao cac ban"));
+            Assert.IsTrue("xin chao cac ban".IsPureAscii());
 
             //Is false
-            Assert.IsFalse(IsPureAscii("xin chào"));
+            Assert.IsFalse("xin chào".IsPureAscii());
         }
     }
 }

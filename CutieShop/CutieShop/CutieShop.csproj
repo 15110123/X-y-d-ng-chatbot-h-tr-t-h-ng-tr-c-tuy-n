@@ -21,26 +21,44 @@
 
   <ItemGroup>
     <!-- Files not to publish (note that the 'dist' subfolders are re-added below) -->
+    <Compile Remove="ClientApp\**" />
     <Compile Remove="StaticWebTest\**" />
     <Content Remove="ClientApp\**" />
     <Content Remove="StaticWebTest\**" />
+    <EmbeddedResource Remove="ClientApp\**" />
     <EmbeddedResource Remove="StaticWebTest\**" />
+    <None Remove="ClientApp\**" />
     <None Remove="StaticWebTest\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="ClientApp\components\Dashboard_nv\ContentDashboard.tsx" />
-    <None Remove="ClientApp\components\Dashboard_nv\ExportReports.tsx" />
-    <None Remove="ClientApp\components\Dashboard_nv\MainPageTrackOrder.tsx" />
-    <None Remove="ClientApp\components\Dashboard_nv\StatusBar.tsx" />
-    <None Remove="ClientApp\components\Dashboard_nv\TrackOrderStatus.tsx" />
-    <None Remove="ClientApp\components\Dashboard_nv\WarningBanner.tsx" />
+    <Compile Remove="Controllers\AuthController.cs" />
+    <Compile Remove="Controllers\HomeController.cs" />
+    <Compile Remove="Controllers\ProductController.cs" />
+    <Compile Remove="Controllers\ReportApiController.cs" />
+    <Compile Remove="Controllers\ReportController.cs" />
+    <Compile Remove="Controllers\ValuesController.cs" />
+    <Compile Remove="Controllers\VisionController.cs" />
+    <Compile Remove="Models\DAOs\AccessoryDAO.cs" />
+    <Compile Remove="Models\DAOs\CageDAO.cs" />
+    <Compile Remove="Models\DAOs\EmployeeDAO.cs" />
+    <Compile Remove="Models\DAOs\FoodDAO.cs" />
+    <Compile Remove="Models\DAOs\PetDAO.cs" />
+    <Compile Remove="Models\DAOs\ReportDAO.cs" />
+    <Compile Remove="Models\DAOs\ServiceDAO.cs" />
+    <Compile Remove="Models\DAOs\SessionDAO.cs" />
+    <Compile Remove="Models\DAOs\ToyDAO.cs" />
+    <Compile Remove="Models\Utils\CookiesUtils.cs" />
+    <Compile Remove="Models\Utils\HtmlConvertUtil.cs" />
+    <Compile Remove="Models\Utils\VisionUtils.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Remove="Properties\PublishProfiles\CutieShopWeb - Web Deploy.pubxml" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ClientApp\css\LinkBar\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="wwwroot\img\" />
   </ItemGroup>
@@ -58,15 +76,6 @@
     <None Include="wwwroot\webfonts\fa-regular-400.woff2" />
     <None Include="wwwroot\webfonts\fa-solid-900.svg" />
     <None Include="wwwroot\webfonts\fa-solid-900.woff2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <TypeScriptCompile Include="ClientApp\components\Dashboard_nv\ContentDashboard.tsx" />
-    <TypeScriptCompile Include="ClientApp\components\Dashboard_nv\ExportReports.tsx" />
-    <TypeScriptCompile Include="ClientApp\components\Dashboard_nv\MainPageTrackOrder.tsx" />
-    <TypeScriptCompile Include="ClientApp\components\Dashboard_nv\StatusBar.tsx" />
-    <TypeScriptCompile Include="ClientApp\components\Dashboard_nv\TrackOrderStatus.tsx" />
-    <TypeScriptCompile Include="ClientApp\components\Dashboard_nv\WarningBanner.tsx" />
   </ItemGroup>
 
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">

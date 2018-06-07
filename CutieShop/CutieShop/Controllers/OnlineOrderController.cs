@@ -22,45 +22,45 @@ namespace CutieShop.Controllers
             return View();
         }
 
-        [HttpGet("user")]
-        public async Task<IActionResult> UserProductOrder()
-        {
-            //find username with session Id
-            using (var sessionDAO = new SessionDAO())
-            {
-                var foundUsername = (await sessionDAO.Read(this.SessionId(), false)).Username;
+        //[HttpGet("user")]
+        //public async Task<IActionResult> UserProductOrder()
+        //{
+        //    //find username with session Id
+        //    using (var sessionDAO = new SessionDAO())
+        //    {
+        //        var foundUsername = (await sessionDAO.Read(this.SessionId(), false)).Username;
 
-                using (var onlineOrderDAO = new OnlineOrderProductDAO(sessionDAO.Context))
-                {
-                    var result = onlineOrderDAO.Context.OnlineOrder
-                    .Include(x => x.Status)
-                    .Include(x => x.OnlineOrderProduct)
-                    .Where(x => x.Username == foundUsername)
-                    .Select(x => new
-                    {
-                        onlineOrderId = x.OnlineOrderId,
-                        lastName = x.LastName,
-                        firstName = x.FirstName,
-                        address = x.Address,
-                        postCode = x.PostCode,
-                        city = x.City,
-                        phoneNo = x.PhoneNo,
-                        email = x.Email,
-                        date = x.Date,
-                        statusId = x.StatusId,
-                        statusName = x.Status.Name,
-                        statusDescription = x.Status.Description,
-                        products = x.OnlineOrderProduct.Select(y => new
-                        {
-                            productId = y.ProductId,
-                            quantity = y.Quantity
-                        })
-                    })
-                    .ToArray();
-                    return Json(result);
-                }
-            }
-        }
+        //        using (var onlineOrderDAO = new OnlineOrderProductDAO(sessionDAO.Context))
+        //        {
+        //            var result = onlineOrderDAO.Context.OnlineOrder
+        //            .Include(x => x.Status)
+        //            .Include(x => x.OnlineOrderProduct)
+        //            .Where(x => x.Username == foundUsername)
+        //            .Select(x => new
+        //            {
+        //                onlineOrderId = x.OnlineOrderId,
+        //                lastName = x.LastName,
+        //                firstName = x.FirstName,
+        //                address = x.Address,
+        //                postCode = x.PostCode,
+        //                city = x.City,
+        //                phoneNo = x.PhoneNo,
+        //                email = x.Email,
+        //                date = x.Date,
+        //                statusId = x.StatusId,
+        //                statusName = x.Status.Name,
+        //                statusDescription = x.Status.Description,
+        //                products = x.OnlineOrderProduct.Select(y => new
+        //                {
+        //                    productId = y.ProductId,
+        //                    quantity = y.Quantity
+        //                })
+        //            })
+        //            .ToArray();
+        //            return Json(result);
+        //        }
+        //    }
+        //}
 
         [HttpGet("all")]
         public async Task<IActionResult> AllProductOrder()
