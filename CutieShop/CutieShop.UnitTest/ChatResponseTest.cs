@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using static CutieShop.Models.Utils.RespBuilderUtils;
-using static CutieShop.Models.Extensions.StringExtension;
 
 namespace CutieShop.UnitTest
 {
@@ -16,16 +15,6 @@ namespace CutieShop.UnitTest
             RespObj(RespType.Button, "Click để quay lại", btnTitle: "Quay lại", btnPayload: "undo"));
             Console.WriteLine(res);
             Assert.Fail();
-        }
-
-        [TestMethod]
-        public void IsPureAsciiTest()
-        {
-            //Is true
-            Assert.IsTrue("xin chao cac ban".IsPureAscii());
-
-            //Is false
-            Assert.IsFalse("xin chào".IsPureAscii());
         }
     }
 }
