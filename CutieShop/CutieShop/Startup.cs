@@ -1,11 +1,9 @@
-﻿//Participants: Lê Minh Tân, Lục Thới Sang
+﻿//Participants: F4 members
 //web: https://cutieshop.azurewebsites.net/
 
-using System;
 using CutieShop.Models.JSONEntities.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,14 +21,14 @@ namespace CutieShop
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSession(options =>
-            {
-                // Set a short timeout for easy testing.
-                options.IdleTimeout = TimeSpan.FromDays(1);
-                options.Cookie.HttpOnly = true;
-            });
-            services.Configure<APISettings>(Configuration.GetSection("APISettings"));
-            services.Configure<AzureSettings>(Configuration.GetSection("AzureSettings"));
+            //services.AddSession(options =>
+            //{
+            //    // Set a short timeout for easy testing.
+            //    options.IdleTimeout = TimeSpan.FromDays(1);
+            //    options.Cookie.HttpOnly = true;
+            //});
+            //services.Configure<APISettings>(Configuration.GetSection("APISettings"));
+            //services.Configure<AzureSettings>(Configuration.GetSection("AzureSettings"));
             services.Configure<MailContent>(Configuration.GetSection("MailContent"));
             services.AddMvc();
             services.AddCors();
@@ -57,7 +55,7 @@ namespace CutieShop
             //    app.UseExceptionHandler("/Home/Error");
             //}
 
-            app.UseExceptionHandler("/Home/Error");
+            //app.UseExceptionHandler("/Home/Error");
 
             app.UseCors(builder =>
             {
@@ -67,9 +65,9 @@ namespace CutieShop
                         .AllowCredentials();
             });
 
-            app.UseStaticFiles();
+            //app.UseStaticFiles();
 
-            app.UseSession();
+            //app.UseSession();
 
             app.UseMvc(routes =>
             {

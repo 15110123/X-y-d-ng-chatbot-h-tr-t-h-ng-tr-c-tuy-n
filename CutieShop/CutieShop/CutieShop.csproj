@@ -48,6 +48,8 @@
     <Compile Remove="Models\DAOs\ServiceDAO.cs" />
     <Compile Remove="Models\DAOs\SessionDAO.cs" />
     <Compile Remove="Models\DAOs\ToyDAO.cs" />
+    <Compile Remove="Models\JSONEntities\Settings\APISettings.cs" />
+    <Compile Remove="Models\JSONEntities\Settings\AzureSettings.cs" />
     <Compile Remove="Models\Utils\CookiesUtils.cs" />
     <Compile Remove="Models\Utils\HtmlConvertUtil.cs" />
     <Compile Remove="Models\Utils\VisionUtils.cs" />
