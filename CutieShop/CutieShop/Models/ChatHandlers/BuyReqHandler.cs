@@ -241,7 +241,7 @@ namespace CutieShop.Models.ChatHandlers
 
                             //Validate email
                             if (!MsgReply.IsEmail())
-                                return Recv.Json(RespObj(RespType.Text, "Email không hợp lệ\nVui lòng nhập lại email"));
+                                return Recv.Json(MultiResp(RespObj(RespType.Text, "Email không hợp lệ\nVui lòng nhập lại email"), RespUndo()));
 
                             user.Email = MsgReply;
                             await userDAO.Context.SaveChangesAsync();
@@ -264,7 +264,7 @@ namespace CutieShop.Models.ChatHandlers
                                 {
                                     user.Email = "";
                                     await userDAO.Context.SaveChangesAsync();
-                                    return Recv.Json(RespObj(RespType.Text, "Bạn hãy cho mình biết email nhé"));
+                                    return Recv.Json(MultiResp(RespObj(RespType.Text, "Bạn hãy cho mình biết email nhé"), RespUndo()));
                                 }
 
                                 Storage.AddOrUpdate(MsgId, 7, "fullName", null);
@@ -283,7 +283,7 @@ namespace CutieShop.Models.ChatHandlers
                             await userDAO.Context.SaveChangesAsync();
                             Storage.AddOrUpdate(MsgId, 7, "phoneNo", null);
                             Storage.AddOrUpdate(MsgId, 7, "isAskForAddress", null);
-                            return Recv.Json(RespObj(RespType.Text, "Bạn cho mình xin số điện thoại ạ"));
+                            return Recv.Json(MultiResp(RespObj(RespType.Text, "Bạn cho mình xin số điện thoại ạ"), RespUndo()));
                         }
 
                         if (user.Address == string.Empty)
