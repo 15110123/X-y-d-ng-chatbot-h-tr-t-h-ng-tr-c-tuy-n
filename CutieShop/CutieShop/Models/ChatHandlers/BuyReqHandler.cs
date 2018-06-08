@@ -248,16 +248,34 @@ namespace CutieShop.Models.ChatHandlers
                         }
 
                         if (Storage[MsgId, 7, "phoneNo"] == null)
-                            switch (Storage[MsgId, 7, "isAskForPhoneNo"])
+                        {
+                            if (Storage[MsgId, 7, "isAskForPhoneNo"] == null)
                             {
-                                case null:
-                                    Storage.AddOrUpdate(MsgId, 7, "isAskForPhoneNo", "1");
-                                    return Recv.Json(MultiResp(
-                                        RespObj(RespType.Text, "Bạn cho mình xin số điện thoại ạ"), RespUndo()));
-                                case "1":
-                                    Storage.AddOrUpdate(MsgId, 7, "phoneNo", MsgReply);
-                                    break;
+                                Storage.AddOrUpdate(MsgId, 7, "isAskForPhoneNo", "1");
+                                return Recv.Json(MultiResp(
+                                    RespObj(RespType.Text, "Bạn cho mình xin số điện thoại ạ"), RespUndo()));
                             }
+
+                            if (_isUndoRequested)
+                            {
+                                Storage.AddOrUpdate(MsgId, 7, "isAskForPhoneNo", null);
+
+                                if (Storage[MsgId, 7, "isAskForEmail"] != null)
+                                {
+                                    user.Email = "";
+                                    await userDAO.Context.SaveChangesAsync();
+                                    return Recv.Json(RespObj(RespType.Text, "Bạn hãy cho mình biết email nhé"));
+                                }
+
+                                Storage.AddOrUpdate(MsgId, 7, "fullName", null);
+                                return Recv.Json(RespObj(RespType.Text, "Cho mình xin họ tên người nhận hàng?"));
+                            }
+
+                            if (Storage[MsgId, 7, "isAskForPhoneNo"] == "1")
+                            {
+                                Storage.AddOrUpdate(MsgId, 7, "phoneNo", MsgReply);
+                            }
+                        }
 
                         if (_isUndoRequested)
                         {
