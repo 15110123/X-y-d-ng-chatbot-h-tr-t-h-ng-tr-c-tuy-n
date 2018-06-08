@@ -297,7 +297,11 @@ namespace CutieShop.Models.ChatHandlers
                                 .MultiReplace(("{0}", buyProd.Name), ("{1}", buyProd.Description), ("{2}", Storage[MsgId, 5]));
 
                             var mailBody = _mailContent.BuyReq.Body
-                                .MultiReplace(("{0}", user.Username), ("{1}", mailPrdctTbl), ("{2}", orderId));
+                                .MultiReplace(
+                                    ("{0}", user.Username), 
+                                    ("{1}", mailPrdctTbl), 
+                                    ("{2}", orderId), 
+                                    ("{3}", (buyProd.Price * int.Parse(Storage[MsgId, 5])).ToString()));
 
                             MailUtils.Send(user.Email, _mailContent.BuyReq.Subject, mailBody);
 
