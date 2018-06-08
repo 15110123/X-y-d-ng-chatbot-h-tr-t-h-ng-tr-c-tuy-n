@@ -5,16 +5,12 @@ VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CutieShop", "CutieShop\CutieShop.csproj", "{E5A83FD3-76B6-4EE6-BCAE-90E87DC83343}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CutieShop.API", "CutieShopAPI\CutieShop.API.csproj", "{1EA6857C-0695-4D3C-BF37-25B662559ED3}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Testing.DB", "Testing.DB\Testing.DB.csproj", "{4E24EAA1-7180-4463-9187-52EDFE60CF08}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CutieShop.OrderManagement", "CutieShop.OrderManagement\CutieShop.OrderManagement.csproj", "{D01EFFB2-9DBC-423A-A423-E3435221F91E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E5A83FD3-76B6-4EE6-BCAE-90E87DC83343} = {E5A83FD3-76B6-4EE6-BCAE-90E87DC83343}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CutieShop.UnitTest", "CutieShop.UnitTest\CutieShop.UnitTest.csproj", "{81E99C6C-37FC-480E-A22A-04253A5EA5B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CutieShop.UnitTest", "CutieShop.UnitTest\CutieShop.UnitTest.csproj", "{81E99C6C-37FC-480E-A22A-04253A5EA5B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,14 +22,6 @@ Global
 		{E5A83FD3-76B6-4EE6-BCAE-90E87DC83343}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5A83FD3-76B6-4EE6-BCAE-90E87DC83343}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5A83FD3-76B6-4EE6-BCAE-90E87DC83343}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1EA6857C-0695-4D3C-BF37-25B662559ED3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1EA6857C-0695-4D3C-BF37-25B662559ED3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1EA6857C-0695-4D3C-BF37-25B662559ED3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1EA6857C-0695-4D3C-BF37-25B662559ED3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4E24EAA1-7180-4463-9187-52EDFE60CF08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4E24EAA1-7180-4463-9187-52EDFE60CF08}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4E24EAA1-7180-4463-9187-52EDFE60CF08}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4E24EAA1-7180-4463-9187-52EDFE60CF08}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D01EFFB2-9DBC-423A-A423-E3435221F91E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D01EFFB2-9DBC-423A-A423-E3435221F91E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D01EFFB2-9DBC-423A-A423-E3435221F91E}.Release|Any CPU.ActiveCfg = Release|Any CPU

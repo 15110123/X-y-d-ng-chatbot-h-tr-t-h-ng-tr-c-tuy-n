@@ -78,6 +78,7 @@ namespace CutieShop.Models.ChatHandlers
                 #region Step 3
                 case 3:
                     //Check if answer is valid
+                    // ReSharper disable once InvertIf
                     if (!_isSkipValidation)
                     {
                         if (new[] { "Đồ chơi", "Thức ăn", "Lồng", "phụ kiện" }.All(x => x != MsgReply))
@@ -85,9 +86,9 @@ namespace CutieShop.Models.ChatHandlers
                             _isSkipValidation = true;
                             goto case 2;
                         }
-                    }
 
-                    Storage.AddOrUpdateAndMoveNext(MsgId, MsgReply);
+                        Storage.AddOrUpdateAndMoveNext(MsgId, MsgReply);
+                    }
 
                     return Recv.Json(RespObj(RespType.QuickReplies,
                         "Bạn có thể cho mình biết mức giá bạn muốn tìm kiếm?",
@@ -98,13 +99,15 @@ namespace CutieShop.Models.ChatHandlers
                 case 4:
                     //Check if answer is valid
                     if (!_isSkipValidation)
-                        if (new[] { "<100000", "100000 - 300000", ">300000 - 500000", ">500000" }.All(x => x != MsgReply))
+                    {
+                        if (new[] {"<100000", "100000 - 300000", ">300000 - 500000", ">500000"}.All(x => x != MsgReply))
                         {
                             _isSkipValidation = true;
                             goto case 3;
                         }
 
-                    Storage.AddOrUpdateAndMoveNext(MsgId, MsgReply);
+                        Storage.AddOrUpdateAndMoveNext(MsgId, MsgReply);
+                    }
 
                     //Find minimum and maximum price from step 3
                     int minimumPrice, maximumPrice;
